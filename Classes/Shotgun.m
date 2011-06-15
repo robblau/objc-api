@@ -5,12 +5,18 @@
 //  Created by Rob Blau on 6/8/11.
 //  Copyright 2011 Laika. All rights reserved.
 //
-//  TODO: Implement Authentication
-//  TODO: Switch to returning ShotgunRequest objects for async
-//  TODO: Figure out a way to do image url lookup in the background
+
+/*!
+ * @todo Implement Authentication
+ * @todo Switch to returning ShotgunRequest objects for async
+ * @todo Figure out a way to do image url lookup in the background
+ * @todo Get rid of option to not use UTC dates
+ * @todo Figure out how to handle date fields
+ */
 
 #import "SBJson.h"
 #import "ASIFormDataRequest.h"
+
 #import "Config.h"
 #import "ServerCapabilities.h"
 #import "ClientCapabilities.h"
@@ -56,17 +62,17 @@
     return [self _callRpcWithMethod:@"info" andParams:Nil includeScriptName:NO returnFirst:NO];
 }
 
-- (NSDictionary *)findEntityOfType: (NSString *)entityType withFilters:(id)filters
+- (ShotgunEntity *)findEntityOfType: (NSString *)entityType withFilters:(id)filters
 {
     return [self findEntityOfType:entityType withFilters:filters andFields:Nil];
 }
 
-- (NSDictionary *)findEntityOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields 
+- (ShotgunEntity *)findEntityOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields 
 {
     return [self findEntityOfType:entityType withFilters:filters andFields:fields andOrder:Nil andFilterOperator:Nil retiredOnly:NO];
 }
 
-- (NSDictionary *)findEntityOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields 
+- (ShotgunEntity *)findEntityOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields 
                           andOrder:(id)order andFilterOperator:(NSString *)filterOperator retiredOnly:(BOOL)retiredOnly
 {
     NSArray *results = [self findEntitiesOfType:entityType withFilters:filters andFields:fields andOrder:order 
@@ -220,12 +226,12 @@
 }
 
 #pragma mark Modify Information
-- (NSDictionary *)createEntityOfType: (NSString *)entityType withData:(id)data
+- (ShotgunEntity *)createEntityOfType: (NSString *)entityType withData:(id)data
 {
     return [self createEntityOfType:entityType withData:data returnFields:Nil];
 }
 
-- (NSDictionary *)createEntityOfType: (NSString *)entityType withData:(id)data returnFields:(id)returnFields
+- (ShotgunEntity *)createEntityOfType: (NSString *)entityType withData:(id)data returnFields:(id)returnFields
 {
     NSArray *argFields = returnFields;
     if (argFields == Nil)
@@ -239,7 +245,7 @@
     return [[self _parseRecords:record] objectAtIndex:0];
 }
 
-- (NSDictionary *)updateEntityOfType: (NSString *)entityType withId:(NSNumber *)entityId withData:(id)data
+- (ShotgunEntity *)updateEntityOfType: (NSString *)entityType withId:(NSNumber *)entityId withData:(id)data
 {
     NSDictionary *params = [[[NSDictionary alloc] initWithObjectsAndKeys:
                                 entityType, @"type",
@@ -725,14 +731,14 @@
             [ret addObject:record];
             continue;
         }
-        NSMutableDictionary *mutieDict = [[[NSMutableDictionary alloc] initWithDictionary:record] autorelease];
-        [ret addObject:mutieDict];
+        ShotgunEntity *entity = [[[ShotgunEntity alloc] initWithDictionary:record] autorelease];
+        [ret addObject:entity];
         for (id key in record) {
-            id value = [mutieDict objectForKey:key];
+            id value = [entity objectForKey:key];
             if (value == Nil)
                 continue;
             if ([key isEqualToString:@"image"]) {
-                [mutieDict setValue:[self _buildThumbUrlForEntityOfType:[record objectForKey:@"type"] andId:[record objectForKey:@"id"]]
+                [entity setValue:[self _buildThumbUrlForEntityOfType:[record objectForKey:@"type"] andId:[record objectForKey:@"id"]]
                              forKey:@"image"];
                 continue;
             }

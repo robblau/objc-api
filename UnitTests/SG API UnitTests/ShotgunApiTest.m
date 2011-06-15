@@ -49,17 +49,16 @@
         \"description\": \"This template should be retired by the unit tests if everything goes well.\", \
         \"entity_type\": \"Shot\" \
     }";
-    NSDictionary *template = [shotgun createEntityOfType:@"TaskTemplate" withData:data];
-    NSNumber *templateId = [template objectForKey:@"id"];
-    GHAssertTrue([templateId intValue] != 0, @"return id of Task Template was Nil");
+    ShotgunEntity *template = [shotgun createEntityOfType:@"TaskTemplate" withData:data];
+    GHAssertTrue([template entityId] != 0, @"return id of Task Template was Nil");
     // Update
     NSString *updateData = @"{ \
         \"description\": \"Updated description.  Delete Next.\" \
     }";
-    NSDictionary *updatedTemplate = [shotgun updateEntityOfType:@"TaskTemplate" withId:templateId withData:updateData];
+    ShotgunEntity *updatedTemplate = [shotgun updateEntityOfType:@"TaskTemplate" withId:[template entityId] withData:updateData];
     GHAssertEqualStrings([updatedTemplate valueForKey:@"description"], @"Updated description.  Delete Next.", @"Description not updated");
     // Delete
-    BOOL result = [shotgun deleteEntityOfType:@"TaskTemplate" withId:templateId];
+    BOOL result = [shotgun deleteEntityOfType:@"TaskTemplate" withId:[template entityId]];
     GHAssertTrue(result, @"delete for Task Template returned False");
 }
 

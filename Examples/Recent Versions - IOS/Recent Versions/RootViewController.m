@@ -97,7 +97,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Get selected project and tell the detail view
-    NSDictionary *project = [projects objectAtIndex:[indexPath row]];
+    ShotgunEntity *project = [projects objectAtIndex:[indexPath row]];
     [detailViewController setDetailItem:project];
 }
 

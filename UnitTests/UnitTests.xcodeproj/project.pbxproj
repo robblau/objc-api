@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		5C78862113A9250C00937E54 /* icon114.png in Resources */ = {isa = PBXBuildFile; fileRef = 5C78862013A9250C00937E54 /* icon114.png */; };
 		5C78862413A925C600937E54 /* icon57.png in Resources */ = {isa = PBXBuildFile; fileRef = 5C78862313A925C600937E54 /* icon57.png */; };
+		5C78863813A930F600937E54 /* ShotgunEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C78863713A930F600937E54 /* ShotgunEntity.m */; };
+		5C78864413A937D900937E54 /* ShotgunRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C78864313A937D900937E54 /* ShotgunRequest.m */; };
 		5CA19B9E13A8375A001EFE89 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CA19B9D13A8375A001EFE89 /* Foundation.framework */; };
 		5CA19BA613A8375A001EFE89 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5CA19BA413A8375A001EFE89 /* InfoPlist.strings */; };
 		5CA19BAC13A8375A001EFE89 /* SG_API_UnitTestsAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA19BAB13A8375A001EFE89 /* SG_API_UnitTestsAppDelegate.m */; };
@@ -57,6 +59,10 @@
 /* Begin PBXFileReference section */
 		5C78862013A9250C00937E54 /* icon114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon114.png; sourceTree = "<group>"; };
 		5C78862313A925C600937E54 /* icon57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon57.png; sourceTree = "<group>"; };
+		5C78863613A930F600937E54 /* ShotgunEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShotgunEntity.h; sourceTree = "<group>"; };
+		5C78863713A930F600937E54 /* ShotgunEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShotgunEntity.m; sourceTree = "<group>"; };
+		5C78864213A937D900937E54 /* ShotgunRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShotgunRequest.h; sourceTree = "<group>"; };
+		5C78864313A937D900937E54 /* ShotgunRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShotgunRequest.m; sourceTree = "<group>"; };
 		5CA19B9213A83705001EFE89 /* GHUnitIOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GHUnitIOS.framework; path = "../Dependencies/gh-unit/Project-IPhone/build/Framework/GHUnitIOS.framework"; sourceTree = "<group>"; };
 		5CA19B9713A8375A001EFE89 /* SG API UnitTests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SG API UnitTests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5CA19B9D13A8375A001EFE89 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -239,14 +245,18 @@
 		5CA19BC813A83ADE001EFE89 /* shotgun-api */ = {
 			isa = PBXGroup;
 			children = (
+				5CA19BCF13A83ADE001EFE89 /* Shotgun.h */,
+				5CA19BD013A83ADE001EFE89 /* Shotgun.m */,
+				5C78864213A937D900937E54 /* ShotgunRequest.h */,
+				5C78864313A937D900937E54 /* ShotgunRequest.m */,
+				5C78863613A930F600937E54 /* ShotgunEntity.h */,
+				5C78863713A930F600937E54 /* ShotgunEntity.m */,
 				5CA19BC913A83ADE001EFE89 /* ClientCapabilities.h */,
 				5CA19BCA13A83ADE001EFE89 /* ClientCapabilities.m */,
 				5CA19BCB13A83ADE001EFE89 /* Config.h */,
 				5CA19BCC13A83ADE001EFE89 /* Config.m */,
 				5CA19BCD13A83ADE001EFE89 /* ServerCapabilities.h */,
 				5CA19BCE13A83ADE001EFE89 /* ServerCapabilities.m */,
-				5CA19BCF13A83ADE001EFE89 /* Shotgun.h */,
-				5CA19BD013A83ADE001EFE89 /* Shotgun.m */,
 			);
 			name = "shotgun-api";
 			path = ../Classes;
@@ -371,6 +381,9 @@
 /* Begin PBXProject section */
 		5CA19B7B13A83654001EFE89 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = Laika;
+			};
 			buildConfigurationList = 5CA19B7E13A83654001EFE89 /* Build configuration list for PBXProject "UnitTests" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -440,6 +453,8 @@
 				5CA19C5513A83BF8001EFE89 /* ASIInputStream.m in Sources */,
 				5CA19C5613A83BF8001EFE89 /* ASINetworkQueue.m in Sources */,
 				5CA19C7713A83CC6001EFE89 /* Reachability.m in Sources */,
+				5C78863813A930F600937E54 /* ShotgunEntity.m in Sources */,
+				5C78864413A937D900937E54 /* ShotgunRequest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

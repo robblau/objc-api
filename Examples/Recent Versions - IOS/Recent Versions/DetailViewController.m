@@ -26,7 +26,7 @@
 /*
  When setting the detail item, update the view and dismiss the popover controller if it's showing.
  */
-- (void)setDetailItem:(id)newDetailItem
+- (void)setDetailItem:(ShotgunEntity *)newDetailItem
 {
     if (_detailItem != newDetailItem) {
         [_detailItem release];
@@ -37,7 +37,7 @@
         versions = [[shotgun findEntitiesOfType:@"Version"
                                     withFilters:[NSString stringWithFormat:
                                                  @"[[\"project\", \"is\", {\"type\": \"Project\", \"id\": %@}]]",
-                                                 [_detailItem objectForKey:@"id"]]
+                                                 [_detailItem entityId]]
                                       andFields:@"[\"code\", \"sg_status_list\", \"image\", \"created_at\"]" 
                                        andOrder:@"[{\"field_name\": \"created_at\", \"direction\": \"desc\"}]"
                               andFilterOperator:Nil andLimit:50 andPage:0 retiredOnly:NO] retain];
@@ -87,7 +87,6 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     return 1;
-    
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -116,7 +115,7 @@
     [formatter setDateFormat:@"d/M/yyyy H:mm"];
 
     for (int x=0; x<5 && (start+x)<count; x++) {
-        NSDictionary *version = [versions objectAtIndex:(start+x)];
+        ShotgunEntity *version = [versions objectAtIndex:(start+x)];
         // Set the label text to the 'code' field on the version followed
         // by the formatted creation date.
         [[[cell labels] objectAtIndex:x] setText:[NSString stringWithFormat:@"%@\n%@",

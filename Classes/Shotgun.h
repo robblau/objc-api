@@ -6,6 +6,8 @@
 //  Copyright 2011 Laika. All rights reserved.
 //
 
+#pragma mark - Main Page Documentation
+
 /*!
  *
  * @mainpage %Shotgun API
@@ -114,6 +116,7 @@
  *   @li Better API around paging
  *   @li Finish documentation
  *   @li Round out unit tets.  Use <a href="http://www.mulle-kybernetik.com/software/OCMock/">OCMock</a>.
+ *   @li \ref todo "Other inline TODOs"
  *
  * @section Dependencies
  *  \li ASIHTTPRequest: http://allseeing-i.com/ASIHTTPRequest/
@@ -126,9 +129,14 @@
  * Rob Blau <rblau@laika.com>
  *
  */
+
+#pragma mark - Interface
+
 #import <Foundation/Foundation.h>
+#import "ShotgunEntity.h"
 
 @class Config;
+@class ShotgunRequest;
 @class ServerCapabilities;
 @class ClientCapabilities;
 
@@ -166,9 +174,9 @@
  */
 - (NSDictionary *)info;
 
-- (NSDictionary *)findEntityOfType: (NSString *)entityType withFilters:(id)filters;
-- (NSDictionary *)findEntityOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields;
-- (NSDictionary *)findEntityOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields 
+- (ShotgunEntity *)findEntityOfType: (NSString *)entityType withFilters:(id)filters;
+- (ShotgunEntity *)findEntityOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields;
+- (ShotgunEntity *)findEntityOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields 
                           andOrder:(id)order andFilterOperator:(NSString *)filterOperator retiredOnly:(BOOL)retiredOnly;
 - (NSArray *)findEntitiesOfType: (NSString *)entityType withFilters:(id)filters;
 - (NSArray *)findEntitiesOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields;
@@ -188,14 +196,14 @@
  * @param page An NSUInteger.  When specified will return page @p page of the results.
  * @param retiredOnly A BOOL.  Return retired entities if YES.  Un-retired entities otherwise.
  *
- * @return An NSArray of NSDictionaries representing the entities that match the filters.
+ * @return An NSArray of ShotgunEntity objects that match the filters.
  */
 - (NSArray *)findEntitiesOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields 
                        andOrder:(id)order andFilterOperator:(NSString *)filterOperator andLimit:(NSUInteger)limit
                         andPage:(NSUInteger)page retiredOnly:(BOOL)retiredOnly;
 
 #pragma mark Modify Information
-- (NSDictionary *)createEntityOfType: (NSString *)entityType withData:(id)data;
+- (ShotgunEntity *)createEntityOfType: (NSString *)entityType withData:(id)data;
 
 /*! Create a new entity
  *
@@ -203,10 +211,20 @@
  * @param data An NSDictionary specifying values for fields on the new entity (or an NSString that is well formed JSON describing the same value).
  * @param returnFields An NSArray of NSStrings specifying what fields to return (or an NSString that is well formed JSON describing the same value).
  *
- * @return An NSDictionary representing the created entity populated with the specified @p returnFields.
+ * @return A ShotgunEntity representing the created entity populated with the specified @p returnFields.
  */
-- (NSDictionary *)createEntityOfType: (NSString *)entityType withData:(id)data returnFields:(id)returnFields;
-- (NSDictionary *)updateEntityOfType: (NSString *)entityType withId:(NSNumber *)entityId withData:(id)data;
+- (ShotgunEntity *)createEntityOfType: (NSString *)entityType withData:(id)data returnFields:(id)returnFields;
+
+/*! Update an existing entity
+ *
+ * @param entityType An NSString specifying the type of entity to return.
+ * @param entityId An NSNumber with the id of the entity to update.
+ * @param data An NSDictionary specifying values for fields on the new entity (or an NSString that is well formed JSON describing the same value).
+ * @param returnFields An NSArray of NSStrings specifying what fields to return (or an NSString that is well formed JSON describing the same value).
+ *
+ * @return A ShotgunEntity representing the created entity populated with the specified @p returnFields.
+ */
+- (ShotgunEntity *)updateEntityOfType: (NSString *)entityType withId:(NSNumber *)entityId withData:(id)data;
 
 /*! Retire an entity from the database
  *

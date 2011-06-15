@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5C78865113A94D3500937E54 /* ShotgunEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C78864E13A94D3500937E54 /* ShotgunEntity.m */; };
+		5C78865213A94D3500937E54 /* ShotgunRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C78865013A94D3500937E54 /* ShotgunRequest.m */; };
 		5C8DB37213A86195000A1105 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C8DB37113A86195000A1105 /* UIKit.framework */; };
 		5C8DB37413A86196000A1105 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C8DB37313A86196000A1105 /* Foundation.framework */; };
 		5C8DB37613A86196000A1105 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C8DB37513A86196000A1105 /* CoreGraphics.framework */; };
@@ -53,6 +55,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5C78864D13A94D3500937E54 /* ShotgunEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShotgunEntity.h; sourceTree = "<group>"; };
+		5C78864E13A94D3500937E54 /* ShotgunEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShotgunEntity.m; sourceTree = "<group>"; };
+		5C78864F13A94D3500937E54 /* ShotgunRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShotgunRequest.h; sourceTree = "<group>"; };
+		5C78865013A94D3500937E54 /* ShotgunRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShotgunRequest.m; sourceTree = "<group>"; };
 		5C8DB36D13A86195000A1105 /* Recent Versions.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Recent Versions.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C8DB37113A86195000A1105 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		5C8DB37313A86196000A1105 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -293,14 +299,18 @@
 		5CCBCBB513A8655B00437353 /* shotgun-api */ = {
 			isa = PBXGroup;
 			children = (
+				5CCBCBBC13A8655B00437353 /* Shotgun.h */,
+				5CCBCBBD13A8655B00437353 /* Shotgun.m */,
+				5C78864D13A94D3500937E54 /* ShotgunEntity.h */,
+				5C78864E13A94D3500937E54 /* ShotgunEntity.m */,
+				5C78864F13A94D3500937E54 /* ShotgunRequest.h */,
+				5C78865013A94D3500937E54 /* ShotgunRequest.m */,
 				5CCBCBB613A8655B00437353 /* ClientCapabilities.h */,
 				5CCBCBB713A8655B00437353 /* ClientCapabilities.m */,
 				5CCBCBB813A8655B00437353 /* Config.h */,
 				5CCBCBB913A8655B00437353 /* Config.m */,
 				5CCBCBBA13A8655B00437353 /* ServerCapabilities.h */,
 				5CCBCBBB13A8655B00437353 /* ServerCapabilities.m */,
-				5CCBCBBC13A8655B00437353 /* Shotgun.h */,
-				5CCBCBBD13A8655B00437353 /* Shotgun.m */,
 			);
 			name = "shotgun-api";
 			path = ../../Classes;
@@ -410,6 +420,8 @@
 				5CCBCBBF13A8655C00437353 /* Config.m in Sources */,
 				5CCBCBC013A8655C00437353 /* ServerCapabilities.m in Sources */,
 				5CCBCBC113A8655C00437353 /* Shotgun.m in Sources */,
+				5C78865113A94D3500937E54 /* ShotgunEntity.m in Sources */,
+				5C78865213A94D3500937E54 /* ShotgunRequest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
