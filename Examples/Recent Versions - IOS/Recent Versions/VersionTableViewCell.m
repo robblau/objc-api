@@ -8,7 +8,6 @@
 
 #import "VersionTableViewCell.h"
 
-
 @implementation VersionTableViewCell
 @synthesize image1;
 @synthesize image2;

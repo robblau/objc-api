@@ -10,7 +10,6 @@
 
 
 @interface VersionTableViewCell : UITableViewCell {
-    
     UIImageView *image1;
     UIImageView *image2;
     UIImageView *image3;

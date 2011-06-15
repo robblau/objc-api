@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5C78862113A9250C00937E54 /* icon114.png in Resources */ = {isa = PBXBuildFile; fileRef = 5C78862013A9250C00937E54 /* icon114.png */; };
+		5C78862413A925C600937E54 /* icon57.png in Resources */ = {isa = PBXBuildFile; fileRef = 5C78862313A925C600937E54 /* icon57.png */; };
 		5CA19B9E13A8375A001EFE89 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CA19B9D13A8375A001EFE89 /* Foundation.framework */; };
 		5CA19BA613A8375A001EFE89 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5CA19BA413A8375A001EFE89 /* InfoPlist.strings */; };
 		5CA19BAC13A8375A001EFE89 /* SG_API_UnitTestsAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA19BAB13A8375A001EFE89 /* SG_API_UnitTestsAppDelegate.m */; };
@@ -53,6 +55,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5C78862013A9250C00937E54 /* icon114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon114.png; sourceTree = "<group>"; };
+		5C78862313A925C600937E54 /* icon57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon57.png; sourceTree = "<group>"; };
 		5CA19B9213A83705001EFE89 /* GHUnitIOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GHUnitIOS.framework; path = "../Dependencies/gh-unit/Project-IPhone/build/Framework/GHUnitIOS.framework"; sourceTree = "<group>"; };
 		5CA19B9713A8375A001EFE89 /* SG API UnitTests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SG API UnitTests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5CA19B9D13A8375A001EFE89 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -335,6 +339,8 @@
 		5CA19C8213A83E13001EFE89 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				5C78862313A925C600937E54 /* icon57.png */,
+				5C78862013A9250C00937E54 /* icon114.png */,
 				5CA19C8313A83E13001EFE89 /* test.jpg */,
 			);
 			path = Resources;
@@ -392,6 +398,8 @@
 				5CA19BBA13A8375A001EFE89 /* MainWindow_iPad.xib in Resources */,
 				5CA19C8413A83E13001EFE89 /* Config.plist in Resources */,
 				5CA19C8513A83E13001EFE89 /* test.jpg in Resources */,
+				5C78862113A9250C00937E54 /* icon114.png in Resources */,
+				5C78862413A925C600937E54 /* icon57.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -562,6 +570,7 @@
 				5CA19BBD13A8375A001EFE89 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
