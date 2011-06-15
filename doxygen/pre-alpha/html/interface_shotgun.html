@@ -18,7 +18,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="Icon.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">Shotgun ObjC Api&#160;<span id="projectnumber">pre-alpha</span></div>
    <div id="projectbrief">Objective C API to talk to a Shotgun Instance</div>
@@ -30,6 +29,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li id="searchli">
@@ -78,7 +78,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">(id)&#160;</td><td class="memItemRight" valign="bottom">- <a class="el" href="interface_shotgun.html#a03c6bee4be41ea8b42d2f48bbd76c1c6">initWithUrl:scriptName:andKey:andConvertDatetimesToUTC:</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">(NSDictionary *)&#160;</td><td class="memItemRight" valign="bottom">- <a class="el" href="interface_shotgun.html#ac3c4a56fa621d2e758690bc0749be4d5">info</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">(NSArray *)&#160;</td><td class="memItemRight" valign="bottom">- <a class="el" href="interface_shotgun.html#a0ee9368dff817214505e97f07c97ecac">findEntitiesOfType:withFilters:andFields:andOrder:andFilterOperator:andLimit:andPage:retiredOnly:</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">(NSDictionary *)&#160;</td><td class="memItemRight" valign="bottom">- <a class="el" href="interface_shotgun.html#a8080147024632c40e5ad372bc617f3fc">createEntityOfType:withData:returnFields:</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">(<a class="el" href="interface_shotgun_entity.html">ShotgunEntity</a> *)&#160;</td><td class="memItemRight" valign="bottom">- <a class="el" href="interface_shotgun.html#adbd91bb1657306ae875391ed0a53152e">createEntityOfType:withData:returnFields:</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">(<a class="el" href="interface_shotgun_entity.html">ShotgunEntity</a> *)&#160;</td><td class="memItemRight" valign="bottom">- <a class="el" href="interface_shotgun.html#afed2a3ff08e4a76da3a7c3b0e75ed88e">updateEntityOfType:withId:withData:</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">(BOOL)&#160;</td><td class="memItemRight" valign="bottom">- <a class="el" href="interface_shotgun.html#a8a844b9be785054afd3072a4de260380">deleteEntityOfType:withId:</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">(BOOL)&#160;</td><td class="memItemRight" valign="bottom">- <a class="el" href="interface_shotgun.html#ac42dace48ed120ffd859246808fc1edb">reviveEntityOfType:withId:</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">(NSArray *)&#160;</td><td class="memItemRight" valign="bottom">- <a class="el" href="interface_shotgun.html#a76bf93e9f3e4fbcee22bdda4cab2e50b">batch:</a></td></tr>
@@ -95,6 +96,12 @@ Public Member Functions</h2></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Represents a connection to a shotgun server. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd><p class="startdd">Implement Authentication </p>
+<p>Switch to returning <a class="el" href="interface_shotgun_request.html" title="Represents a request being made to a Shotgun instance.">ShotgunRequest</a> objects for async </p>
+<p>Figure out a way to do image url lookup in the background </p>
+<p>Get rid of option to not use UTC dates </p>
+<p class="enddd">Figure out how to handle date fields </p>
+</dd></dl>
 </div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a76bf93e9f3e4fbcee22bdda4cab2e50b"></a><!-- doxytag: member="Shotgun::batch:" ref="a76bf93e9f3e4fbcee22bdda4cab2e50b" args="(id requests)" -->
 <div class="memitem">
@@ -122,12 +129,12 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a8080147024632c40e5ad372bc617f3fc"></a><!-- doxytag: member="Shotgun::createEntityOfType:withData:returnFields:" ref="a8080147024632c40e5ad372bc617f3fc" args="(NSString *entityType,[withData] id data,[returnFields] id returnFields)" -->
+<a class="anchor" id="adbd91bb1657306ae875391ed0a53152e"></a><!-- doxytag: member="Shotgun::createEntityOfType:withData:returnFields:" ref="adbd91bb1657306ae875391ed0a53152e" args="(NSString *entityType,[withData] id data,[returnFields] id returnFields)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">- (NSDictionary *) createEntityOfType: </td>
+          <td class="memname">- (<a class="el" href="interface_shotgun_entity.html">ShotgunEntity</a> *) createEntityOfType: </td>
           <td></td>
           <td class="paramtype">(NSString *)&#160;</td>
           <td class="paramname"><em>entityType</em></td>
@@ -161,7 +168,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>An NSDictionary representing the created entity populated with the specified <code>returnFields</code>. </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>A <a class="el" href="interface_shotgun_entity.html" title="Represents a Shotgun entity.">ShotgunEntity</a> representing the created entity populated with the specified <code>returnFields</code>. </dd></dl>
 
 </div>
 </div>
@@ -292,7 +299,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>An NSArray of NSDictionaries representing the entities that match the filters. </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>An NSArray of <a class="el" href="interface_shotgun_entity.html" title="Represents a Shotgun entity.">ShotgunEntity</a> objects that match the filters. </dd></dl>
 
 </div>
 </div>
@@ -581,6 +588,50 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="afed2a3ff08e4a76da3a7c3b0e75ed88e"></a><!-- doxytag: member="Shotgun::updateEntityOfType:withId:withData:" ref="afed2a3ff08e4a76da3a7c3b0e75ed88e" args="(NSString *entityType,[withId] NSNumber *entityId,[withData] id data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">- (<a class="el" href="interface_shotgun_entity.html">ShotgunEntity</a> *) updateEntityOfType: </td>
+          <td></td>
+          <td class="paramtype">(NSString *)&#160;</td>
+          <td class="paramname"><em>entityType</em></td>
+        </tr>
+        <tr>
+          <td class="paramkey">withId:</td>
+          <td></td>
+          <td class="paramtype">(NSNumber *)&#160;</td>
+          <td class="paramname"><em>entityId</em></td>
+        </tr>
+        <tr>
+          <td class="paramkey">withData:</td>
+          <td></td>
+          <td class="paramtype">(id)&#160;</td>
+          <td class="paramname"><em>data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Update an existing entity</p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entityType</td><td>An NSString specifying the type of entity to return. </td></tr>
+    <tr><td class="paramname">entityId</td><td>An NSNumber with the id of the entity to update. </td></tr>
+    <tr><td class="paramname">data</td><td>An NSDictionary specifying values for fields on the new entity (or an NSString that is well formed JSON describing the same value). </td></tr>
+    <tr><td class="paramname">returnFields</td><td>An NSArray of NSStrings specifying what fields to return (or an NSString that is well formed JSON describing the same value).</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>A <a class="el" href="interface_shotgun_entity.html" title="Represents a Shotgun entity.">ShotgunEntity</a> representing the created entity populated with the specified <code>returnFields</code>. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ac3cd8bcc493d42c0ed1c73238523f650"></a><!-- doxytag: member="Shotgun::uploadForEntityOfType:withId:fromPath:forField:withDisplayName:andTagList:" ref="ac3cd8bcc493d42c0ed1c73238523f650" args="(NSString *entityType,[withId] NSNumber *entityId,[fromPath] NSString *path,[forField] NSString *fieldName,[withDisplayName] NSString *displayName,[andTagList] NSString *tagList)" -->
 <div class="memitem">
 <div class="memproto">
@@ -666,8 +717,8 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/Users/rblau/Desktop/Projects/objc-api/master/Classes/<a class="el" href="_shotgun_8h_source.html">Shotgun.h</a></li>
-<li>/Users/rblau/Desktop/Projects/objc-api/master/Classes/Shotgun.m</li>
+<li>/Users/rblau/Desktop/Projects/objc-api/pre-alpha/Classes/<a class="el" href="_shotgun_8h_source.html">Shotgun.h</a></li>
+<li>/Users/rblau/Desktop/Projects/objc-api/pre-alpha/Classes/Shotgun.m</li>
 </ul>
 </div>
 <!-- window showing the filter options -->
@@ -675,7 +726,7 @@ Public Member Functions</h2></td></tr>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Properties</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -684,7 +735,7 @@ Public Member Functions</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Wed Jun 15 2011 01:28:47 for Shotgun ObjC Api by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Wed Jun 15 2011 13:40:00 for Shotgun ObjC Api by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
