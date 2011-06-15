@@ -1,0 +1,9 @@
+[submodule "Dependencies/gh-unit"]
+	path = Dependencies/gh-unit
+	url = git://github.com/gabriel/gh-unit.git
+[submodule "Dependencies/asi-http-request"]
+	path = Dependencies/asi-http-request
+	url = git://github.com/pokeb/asi-http-request.git
+[submodule "Dependencies/json-framework"]
+	path = Dependencies/json-framework
+	url = git://github.com/stig/json-framework.git
