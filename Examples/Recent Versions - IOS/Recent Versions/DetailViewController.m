@@ -3,7 +3,7 @@
 //  Recent Versions
 //
 //  Created by Rob Blau on 6/14/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 Laika. All rights reserved.
 //
 
 #import "Shotgun.h"
@@ -32,7 +32,7 @@
         [_detailItem release];
         _detailItem = [newDetailItem retain];
         
-        // Update the view.
+        // Detail item is the selected Project, grab the 50 latest versions in that project
         [versions release];
         versions = [[shotgun findEntitiesOfType:@"Version"
                                     withFilters:[NSString stringWithFormat:
@@ -41,11 +41,14 @@
                                       andFields:@"[\"code\", \"sg_status_list\", \"image\", \"created_at\"]" 
                                        andOrder:@"[{\"field_name\": \"created_at\", \"direction\": \"desc\"}]"
                               andFilterOperator:Nil andLimit:50 andPage:0 retiredOnly:NO] retain];
+        // Clear the table and reload with the new data
         [versionsTable reloadData];
     }
 }
 
-- (void) awakeFromNib {
+- (void) awakeFromNib
+{
+    // Keep a map of downloaded thumbnails to keep things responsive
     imageMap = [[[NSMutableDictionary alloc] init] retain];
 }
 
@@ -69,23 +72,14 @@
 	[super viewDidDisappear:animated];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
     return UIInterfaceOrientationIsLandscape(interfaceOrientation);
 }
-
-/*
- // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-}
- */
 
 - (void)viewDidUnload
 {
 	[super viewDidUnload];
-
-	// Release any retained subviews of the main view.
 }
 
 #pragma mark - Table View Delegate
@@ -98,12 +92,14 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+    // Sized to 5 versions per row
     int count = [versions count];
     return (count == 0) ? 0 : (count+4)/5;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    // Use our custom layout
     static NSString *CellIdentifier = @"VersionCell";
     
     VersionTableViewCell *cell = (VersionTableViewCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -118,15 +114,21 @@
     int count = [versions count];
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"d/M/yyyy H:mm"];
+
     for (int x=0; x<5 && (start+x)<count; x++) {
         NSDictionary *version = [versions objectAtIndex:(start+x)];
+        // Set the label text to the 'code' field on the version followed
+        // by the formatted creation date.
         [[[cell labels] objectAtIndex:x] setText:[NSString stringWithFormat:@"%@\n%@",
                                                   [version objectForKey:@"code"],
                                                   [formatter stringFromDate:[version objectForKey:@"created_at"]]]];
         UIImage *thumbnail = [imageMap objectForKey:[version objectForKey:@"image"]];
         if (thumbnail) {
+            // Have cached thumbnail
             [[[cell images] objectAtIndex:x] setImage:thumbnail];
         } else {
+            // Need to download the thumbnail, use an asyncronous request to
+            // do it in the background
             __block ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:[version objectForKey:@"image"]]];
             [request setCompletionBlock:^{
                 UIImage *thumbnail = [UIImage imageWithData:[request responseData]];
@@ -140,19 +142,11 @@
     return cell;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Navigation logic may go here -- for example, create and push another view controller.
-}
-
 #pragma mark - Memory management
 
 - (void)didReceiveMemoryWarning
 {
-	// Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-	
-	// Release any cached data, images, etc that aren't in use.
 }
 
 - (void)dealloc

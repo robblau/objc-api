@@ -3,7 +3,7 @@
 //  Example Recent Versions
 //
 //  Created by Rob Blau on 6/13/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 Laika. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

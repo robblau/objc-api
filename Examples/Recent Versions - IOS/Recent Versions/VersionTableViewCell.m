@@ -3,7 +3,7 @@
 //  Example Recent Versions
 //
 //  Created by Rob Blau on 6/13/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 Laika. All rights reserved.
 //
 
 #import "VersionTableViewCell.h"
@@ -23,14 +23,6 @@
 @synthesize images;
 @synthesize labels;
 
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
-{
-    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-    if (self) {
-    }
-    return self;
-}
-
 - (void)awakeFromNib {
     images = [[[NSArray alloc] initWithObjects:image1, image2, image3, image4, image5, nil] retain];
     labels = [[[NSArray alloc] initWithObjects:label1, label2, label3, label4, label5, nil] retain];    
@@ -39,8 +31,6 @@
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
     [super setSelected:selected animated:animated];
-
-    // Configure the view for the selected state
 }
 
 - (void)dealloc

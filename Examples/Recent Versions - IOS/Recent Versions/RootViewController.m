@@ -3,7 +3,7 @@
 //  Recent Versions
 //
 //  Created by Rob Blau on 6/14/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 Laika. All rights reserved.
 //
 
 #import "Shotgun.h"
@@ -21,12 +21,19 @@
     self.clearsSelectionOnViewWillAppear = NO;
     self.contentSizeForViewInPopover = CGSizeMake(320.0, 600.0);
     
+    // Load shotgun connection information from the config plist
     NSString *path = [[NSBundle mainBundle] pathForResource:@"Config" ofType:@"plist"];
     NSDictionary *config = [[[NSDictionary alloc] initWithContentsOfFile:path] autorelease];
+
+    // Create the shotgun connection
     shotgun = [[[Shotgun alloc] initWithUrl:[config objectForKey:@"url"]
                                  scriptName:[config objectForKey:@"script"] 
                                      andKey:[config objectForKey:@"key"]] retain];
+
+    // Share the connection with the detail controller
     detailViewController.shotgun = shotgun;
+
+    // Pull down all the projects from the servers
     projects = [[shotgun findEntitiesOfType:@"Project" withFilters:@"[]" andFields:@"[\"name\", \"image\"]"] retain];
 }
 
@@ -76,7 +83,7 @@
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
 
-    // Configure the cell.
+    // Configure the cell.  Standard table cell with the name of the project and its thumbnail.
     NSDictionary *project = [projects objectAtIndex:[indexPath row]];
     [[cell textLabel] setText:[project objectForKey:@"name"]];
     if ([project objectForKey:@"image"]) {
@@ -87,39 +94,9 @@
     return cell;
 }
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source.
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    // Get selected project and tell the detail view
     NSDictionary *project = [projects objectAtIndex:[indexPath row]];
     [detailViewController setDetailItem:project];
 }
@@ -128,15 +105,9 @@
 {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-
-    // Relinquish ownership any cached data, images, etc that aren't in use.
 }
 
-- (void)viewDidUnload
-{
-    // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
-    // For example: self.myOutlet = nil;
-}
+- (void)viewDidUnload {}
 
 - (void)dealloc
 {

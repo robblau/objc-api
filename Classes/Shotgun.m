@@ -3,7 +3,7 @@
 //  ShotgunApi
 //
 //  Created by Rob Blau on 6/8/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 Laika. All rights reserved.
 //
 //  TODO: Implement Authentication
 //  TODO: Switch to returning ShotgunRequest objects for async
