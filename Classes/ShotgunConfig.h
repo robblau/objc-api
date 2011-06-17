@@ -1,5 +1,5 @@
 //
-//  Config.h
+//  ShotgunConfig.h
 //  ShotgunApi
 //
 //  Created by Rob Blau on 6/8/11.
@@ -9,11 +9,10 @@
 #import <Foundation/Foundation.h>
 
 
-@interface Config : NSObject {
+@interface ShotgunConfig : NSObject {
     NSUInteger maxRpcAttempts;
     NSUInteger timeoutSecs;
     NSString *apiVer;
-    BOOL convertDatetimesToUTC;
     NSUInteger recordsPerPage;
     NSString *apiKey;
     NSString *scriptName;
@@ -27,7 +26,6 @@
 @property (readwrite) NSUInteger maxRpcAttempts;
 @property (readwrite) NSUInteger timeoutSecs;
 @property (retain) NSString *apiVer;
-@property (readwrite) BOOL convertDatetimesToUTC;
 @property (readwrite) NSUInteger recordsPerPage;
 @property (retain) NSString *apiKey;
 @property (retain) NSString *scriptName;

@@ -24,7 +24,7 @@
 		5CA19BC413A8384C001EFE89 /* GHUnitIOSTestMain.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA19BC313A8384C001EFE89 /* GHUnitIOSTestMain.m */; };
 		5CA19BC713A8399C001EFE89 /* ShotgunApiTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA19BC613A8399C001EFE89 /* ShotgunApiTest.m */; };
 		5CA19BD113A83ADE001EFE89 /* ClientCapabilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA19BCA13A83ADE001EFE89 /* ClientCapabilities.m */; };
-		5CA19BD213A83ADE001EFE89 /* Config.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA19BCC13A83ADE001EFE89 /* Config.m */; };
+		5CA19BD213A83ADE001EFE89 /* ShotgunConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA19BCC13A83ADE001EFE89 /* ShotgunConfig.m */; };
 		5CA19BD313A83ADE001EFE89 /* ServerCapabilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA19BCE13A83ADE001EFE89 /* ServerCapabilities.m */; };
 		5CA19BD413A83ADE001EFE89 /* Shotgun.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA19BD013A83ADE001EFE89 /* Shotgun.m */; };
 		5CA19BF013A83BB5001EFE89 /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA19BD813A83BB5001EFE89 /* NSObject+SBJson.m */; };
@@ -83,8 +83,8 @@
 		5CA19BC613A8399C001EFE89 /* ShotgunApiTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShotgunApiTest.m; sourceTree = "<group>"; };
 		5CA19BC913A83ADE001EFE89 /* ClientCapabilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClientCapabilities.h; sourceTree = "<group>"; };
 		5CA19BCA13A83ADE001EFE89 /* ClientCapabilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClientCapabilities.m; sourceTree = "<group>"; };
-		5CA19BCB13A83ADE001EFE89 /* Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
-		5CA19BCC13A83ADE001EFE89 /* Config.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Config.m; sourceTree = "<group>"; };
+		5CA19BCB13A83ADE001EFE89 /* ShotgunConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; path = ShotgunConfig.h; sourceTree = "<group>"; };
+		5CA19BCC13A83ADE001EFE89 /* ShotgunConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShotgunConfig.m; sourceTree = "<group>"; };
 		5CA19BCD13A83ADE001EFE89 /* ServerCapabilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerCapabilities.h; sourceTree = "<group>"; };
 		5CA19BCE13A83ADE001EFE89 /* ServerCapabilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerCapabilities.m; sourceTree = "<group>"; };
 		5CA19BCF13A83ADE001EFE89 /* Shotgun.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shotgun.h; sourceTree = "<group>"; };
@@ -253,8 +253,8 @@
 				5C78863713A930F600937E54 /* ShotgunEntity.m */,
 				5CA19BC913A83ADE001EFE89 /* ClientCapabilities.h */,
 				5CA19BCA13A83ADE001EFE89 /* ClientCapabilities.m */,
-				5CA19BCB13A83ADE001EFE89 /* Config.h */,
-				5CA19BCC13A83ADE001EFE89 /* Config.m */,
+				5CA19BCB13A83ADE001EFE89 /* ShotgunConfig.h */,
+				5CA19BCC13A83ADE001EFE89 /* ShotgunConfig.m */,
 				5CA19BCD13A83ADE001EFE89 /* ServerCapabilities.h */,
 				5CA19BCE13A83ADE001EFE89 /* ServerCapabilities.m */,
 			);
@@ -429,7 +429,7 @@
 				5CA19BC413A8384C001EFE89 /* GHUnitIOSTestMain.m in Sources */,
 				5CA19BC713A8399C001EFE89 /* ShotgunApiTest.m in Sources */,
 				5CA19BD113A83ADE001EFE89 /* ClientCapabilities.m in Sources */,
-				5CA19BD213A83ADE001EFE89 /* Config.m in Sources */,
+				5CA19BD213A83ADE001EFE89 /* ShotgunConfig.m in Sources */,
 				5CA19BD313A83ADE001EFE89 /* ServerCapabilities.m in Sources */,
 				5CA19BD413A83ADE001EFE89 /* Shotgun.m in Sources */,
 				5CA19BF013A83BB5001EFE89 /* NSObject+SBJson.m in Sources */,

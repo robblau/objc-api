@@ -45,7 +45,7 @@
 		5CCBCBB013A8652800437353 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCBCBA413A8652800437353 /* SBJsonWriter.m */; };
 		5CCBCBB413A8654600437353 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCBCBB313A8654600437353 /* Reachability.m */; };
 		5CCBCBBE13A8655C00437353 /* ClientCapabilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCBCBB713A8655B00437353 /* ClientCapabilities.m */; };
-		5CCBCBBF13A8655C00437353 /* Config.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCBCBB913A8655B00437353 /* Config.m */; };
+		5CCBCBBF13A8655C00437353 /* ShotgunConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCBCBB913A8655B00437353 /* ShotgunConfig.m */; };
 		5CCBCBC013A8655C00437353 /* ServerCapabilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCBCBBB13A8655B00437353 /* ServerCapabilities.m */; };
 		5CCBCBC113A8655C00437353 /* Shotgun.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCBCBBD13A8655B00437353 /* Shotgun.m */; };
 		5CCBCBC313A8657800437353 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CCBCBC213A8657800437353 /* MobileCoreServices.framework */; };
@@ -130,8 +130,8 @@
 		5CCBCBB313A8654600437353 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		5CCBCBB613A8655B00437353 /* ClientCapabilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClientCapabilities.h; sourceTree = "<group>"; };
 		5CCBCBB713A8655B00437353 /* ClientCapabilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClientCapabilities.m; sourceTree = "<group>"; };
-		5CCBCBB813A8655B00437353 /* Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
-		5CCBCBB913A8655B00437353 /* Config.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Config.m; sourceTree = "<group>"; };
+		5CCBCBB813A8655B00437353 /* ShotgunConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShotgunConfig.h; sourceTree = "<group>"; };
+		5CCBCBB913A8655B00437353 /* ShotgunConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShotgunConfig.m; sourceTree = "<group>"; };
 		5CCBCBBA13A8655B00437353 /* ServerCapabilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerCapabilities.h; sourceTree = "<group>"; };
 		5CCBCBBB13A8655B00437353 /* ServerCapabilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerCapabilities.m; sourceTree = "<group>"; };
 		5CCBCBBC13A8655B00437353 /* Shotgun.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shotgun.h; sourceTree = "<group>"; };
@@ -307,8 +307,8 @@
 				5C78865013A94D3500937E54 /* ShotgunRequest.m */,
 				5CCBCBB613A8655B00437353 /* ClientCapabilities.h */,
 				5CCBCBB713A8655B00437353 /* ClientCapabilities.m */,
-				5CCBCBB813A8655B00437353 /* Config.h */,
-				5CCBCBB913A8655B00437353 /* Config.m */,
+				5CCBCBB813A8655B00437353 /* ShotgunConfig.h */,
+				5CCBCBB913A8655B00437353 /* ShotgunConfig.m */,
 				5CCBCBBA13A8655B00437353 /* ServerCapabilities.h */,
 				5CCBCBBB13A8655B00437353 /* ServerCapabilities.m */,
 			);
@@ -417,7 +417,7 @@
 				5CCBCBB013A8652800437353 /* SBJsonWriter.m in Sources */,
 				5CCBCBB413A8654600437353 /* Reachability.m in Sources */,
 				5CCBCBBE13A8655C00437353 /* ClientCapabilities.m in Sources */,
-				5CCBCBBF13A8655C00437353 /* Config.m in Sources */,
+				5CCBCBBF13A8655C00437353 /* ShotgunConfig.m in Sources */,
 				5CCBCBC013A8655C00437353 /* ServerCapabilities.m in Sources */,
 				5CCBCBC113A8655C00437353 /* Shotgun.m in Sources */,
 				5C78865113A94D3500937E54 /* ShotgunEntity.m in Sources */,

@@ -8,99 +8,139 @@
 
 /*!
  * @todo Implement Authentication
- * @todo Switch to returning ShotgunRequest objects for async
  * @todo Figure out a way to do image url lookup in the background
- * @todo Get rid of option to not use UTC dates
  * @todo Figure out how to handle date fields
+ * @todo Finish support for local paths
+ * @todo Finish file upload/download asynchronous option
  */
 
 #import "SBJson.h"
+#import "ASIHTTPRequest.h"
 #import "ASIFormDataRequest.h"
 
-#import "Config.h"
+#import "ShotgunConfig.h"
 #import "ServerCapabilities.h"
 #import "ClientCapabilities.h"
+
 #import "Shotgun.h"
+
+@interface Shotgun()
+
+- (ShotgunRequest *)_requestWithMethod:(NSString *)method andParams:(id)params;
+- (ShotgunRequest *)_requestWithMethod:(NSString *)method params:(id)params includeScriptName:(BOOL)includeScriptName returnFirst:(BOOL)first;
+
+- (id)_decodeResponseHeaders:(NSDictionary *)headers andBody:(NSString *)body;
+- (void)_responseErrors:(id)response;
+
+- (id)_transformInboundData:(id)data;
+- (id)_transformOutboundData:(id)data;
+- (id)_visitData:(id)data withVisitor:(id (^)(id))visitor;
+
+- (NSDictionary *)_buildPayloadWithConfig:(ShotgunConfig *)config Method:(NSString *)method andParams:(NSDictionary *)params includeScriptName:(BOOL)includeScriptName;
+
+- (NSString *)_getSessionToken;
+
+- (NSArray *)_parseRecords:(id)records;
+- (NSString *)_buildThumbUrlForEntity:(ShotgunEntity *)entity;
+
+- (NSArray *)_listFromObj:(id)obj;
+- (NSArray *)_listFromObj:(id)obj withKeyName:(NSString *)keyName andValueName:(NSString *)valueName;
+
+@end
 
 @implementation Shotgun
 
 #pragma mark - Public Methods
 
-- (id)initWithUrl: (NSString *)url scriptName:(NSString *)scriptName andKey:(NSString *)key {
-    return [self initWithUrl:url scriptName:scriptName andKey:key andConvertDatetimesToUTC:YES];
-}
-
-- (id)initWithUrl: (NSString *)url scriptName:(NSString *)scriptName 
-           andKey:(NSString *)key andConvertDatetimesToUTC:(BOOL)convertDatetimesToUTC
+- (id)initWithUrl:(NSString *)url scriptName:(NSString *)scriptName andKey:(NSString *)key
 {
     self = [super init];
     if (self) {
-        myConfig = [[Config alloc] init];
-        myConfig.apiKey = [[NSString alloc] initWithString:key];
-        myConfig.scriptName = [[NSString alloc] initWithString:scriptName];
-        myConfig.convertDatetimesToUTC = convertDatetimesToUTC;
+        _config = [[ShotgunConfig alloc] init];
+        _config.apiKey = [[NSString alloc] initWithString:key];
+        _config.scriptName = [[NSString alloc] initWithString:scriptName];
         NSURL *parseUrl = [NSURL URLWithString:[url lowercaseString]];
-        myConfig.scheme = [parseUrl scheme];
-        if (!([myConfig.scheme isEqualToString:@"http"] || [myConfig.scheme isEqualToString:@"https"]))
+        _config.scheme = [parseUrl scheme];
+        if (!([_config.scheme isEqualToString:@"http"] || [_config.scheme isEqualToString:@"https"]))
             [NSException raise:@"Invalid url" format:@"url must use http or https got '%@'", url];
-        myConfig.server = [parseUrl host];
+        _config.server = [parseUrl host];
         NSString *apiBase = [parseUrl path];
         if ([apiBase isEqualToString:@""])
-            myConfig.apiPath = [[NSString alloc] initWithFormat:@"/%@/json", myConfig.apiVer];
+            _config.apiPath = [[NSString alloc] initWithFormat:@"/%@/json", _config.apiVer];
         else
-            myConfig.apiPath = [[NSString alloc] initWithFormat:@"%@/%@/json", apiBase, myConfig.apiVer];
+            _config.apiPath = [[NSString alloc] initWithFormat:@"%@/%@/json", apiBase, _config.apiVer];
         
-        myClientCaps = [[ClientCapabilities alloc] init];
-        myServerCaps = [[ServerCapabilities alloc] initWithHost:myConfig.server andMeta:[self info]];
+        // Get and check server capabilities
+        ShotgunRequest *req = [self info];
+        [req startSynchronous];
+        NSDictionary *info = [req response];
+        if (info)
+            _serverCaps = [[ServerCapabilities alloc] initWithHost:_config.server andMeta:info];
+        else
+            return Nil;
+        // Get and check client capabilities
+        _clientCaps = [[ClientCapabilities alloc] init];
     }
     return self;
 }
 
 #pragma mark Query Information
-- (NSDictionary *)info 
+
+- (ShotgunRequest *)info 
 {
-    return [self _callRpcWithMethod:@"info" andParams:Nil includeScriptName:NO returnFirst:NO];
+    return [self _requestWithMethod:@"info" params:Nil includeScriptName:NO returnFirst:NO];
 }
 
-- (ShotgunEntity *)findEntityOfType: (NSString *)entityType withFilters:(id)filters
+- (ShotgunRequest *)findEntityOfType:(NSString *)entityType withFilters:(id)filters
 {
     return [self findEntityOfType:entityType withFilters:filters andFields:Nil];
 }
 
-- (ShotgunEntity *)findEntityOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields 
+- (ShotgunRequest *)findEntityOfType:(NSString *)entityType withFilters:(id)filters andFields:(id)fields 
 {
     return [self findEntityOfType:entityType withFilters:filters andFields:fields andOrder:Nil andFilterOperator:Nil retiredOnly:NO];
 }
 
-- (ShotgunEntity *)findEntityOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields 
+- (ShotgunRequest *)findEntityOfType:(NSString *)entityType withFilters:(id)filters andFields:(id)fields 
                           andOrder:(id)order andFilterOperator:(NSString *)filterOperator retiredOnly:(BOOL)retiredOnly
 {
-    NSArray *results = [self findEntitiesOfType:entityType withFilters:filters andFields:fields andOrder:order 
-                              andFilterOperator:filterOperator andLimit:1 andPage:0 retiredOnly:retiredOnly];
-    if ([results count] > 0)
-        return [results objectAtIndex:0];
-    return Nil;
+    ShotgunRequest *request = [self findEntitiesOfType:entityType
+                                           withFilters:filters 
+                                             andFields:fields 
+                                              andOrder:order 
+                                     andFilterOperator:filterOperator
+                                              andLimit:1 
+                                               andPage:0 
+                                           retiredOnly:retiredOnly];
+    ShotgunPostProcessBlock oldPost = [request postProcessBlock];
+    [request setPostProcessBlock:^id (NSDictionary *headers, NSString *body) {
+        NSArray *results = oldPost(headers, body);
+        if ([results count] > 0)
+            return [results objectAtIndex:0];
+        return Nil;        
+    }];
+    return request;
 }
 
-- (NSArray *)findEntitiesOfType: (NSString *)entityType withFilters:(id)filters
+- (ShotgunRequest *)findEntitiesOfType:(NSString *)entityType withFilters:(id)filters
 {
     return [self findEntitiesOfType:entityType withFilters:filters andFields:Nil];
 }
 
-- (NSArray *)findEntitiesOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields 
+- (ShotgunRequest *)findEntitiesOfType:(NSString *)entityType withFilters:(id)filters andFields:(id)fields 
 {
     return [self findEntitiesOfType:entityType withFilters:filters andFields:fields 
                            andOrder:Nil andFilterOperator:Nil andLimit:0 andPage:0 retiredOnly:NO];
 }
 
-- (NSArray *)findEntitiesOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields 
+- (ShotgunRequest *)findEntitiesOfType:(NSString *)entityType withFilters:(id)filters andFields:(id)fields 
                        andOrder:(id)order andFilterOperator:(NSString *)filterOperator
 {
     return [self findEntitiesOfType:entityType withFilters:filters andFields:fields 
                            andOrder:order andFilterOperator:filterOperator andLimit:0 andPage:0 retiredOnly:NO];
 }
             
-- (NSArray *)findEntitiesOfType: (NSString *)entityType withFilters:(id)filters andFields:(id)fields 
+- (ShotgunRequest *)findEntitiesOfType:(NSString *)entityType withFilters:(id)filters andFields:(id)fields 
                        andOrder:(id)order andFilterOperator:(NSString *)filterOperator andLimit:(NSUInteger)limit
                         andPage:(NSUInteger)page retiredOnly:(BOOL)retiredOnly
 {
@@ -148,18 +188,18 @@
         [NSException raise:@"Value Error" format:@"Invalid order: %@", order];
         
     // Inital parameters
-    NSMutableDictionary *params = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
+    __block NSMutableDictionary *params = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                         entityType, @"type",
                                         checkedFilters, @"filters",
                                         checkedFields, @"return_fields",
                                         retiredOnly ? @"retired" : @"active", @"return_only",
                                         [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                                [[[NSNumber alloc] initWithUnsignedInteger:myConfig.recordsPerPage] autorelease], @"entities_per_page",
+                                                [[[NSNumber alloc] initWithUnsignedInteger:_config.recordsPerPage] autorelease], @"entities_per_page",
                                                 [[[NSNumber alloc] initWithInt:1] autorelease], @"current_page",
                                           nil] autorelease], @"paging",
                                     nil] autorelease];
     
-    if (myServerCaps.hasPaging)
+    if (_serverCaps.hasPaging)
         [params setObject:[NSNumber numberWithBool:YES] forKey:@"return_paging_info"];
 
     // Order
@@ -180,7 +220,7 @@
         [params setObject:sortList forKey:@"sorts"];
     }
     
-    if (limit && limit <= myConfig.recordsPerPage) {
+    if (limit && limit <= _config.recordsPerPage) {
         [[params objectForKey:@"paging"] 
             setObject:[[[NSNumber alloc] initWithUnsignedInteger:limit] autorelease]
                forKey:@"entities_per_page"];
@@ -190,91 +230,113 @@
     
     // Paging return
     if (page != 0) {
-        if (myServerCaps.hasPaging)
+        if (_serverCaps.hasPaging)
             [params setObject:[NSNumber numberWithBool:NO] forKey:@"return_paging_info"];
         
         [[params objectForKey:@"paging"] 
                 setObject:[[[NSNumber alloc] initWithUnsignedInteger:page] autorelease]
                    forKey:@"current_page"];
-        NSArray *records = [[self _callRpcWithMethod:@"read" andParams:params] objectForKey:@"entities"];
-        if (records == Nil)
-            records = [[[NSArray alloc] init] autorelease];
-        return [self _parseRecords:records];
+        ShotgunRequest *request = [self _requestWithMethod:@"read" andParams:params];
+        ShotgunPostProcessBlock oldPost = [request postProcessBlock];
+        [request setPostProcessBlock:^id (NSDictionary *headers, NSString *body) {
+            NSArray *records = [oldPost(headers, body) objectForKey:@"entities"];
+            if (records == Nil)
+                records = [[[NSArray alloc] init] autorelease];
+            return [self _parseRecords:records];
+        }];
+        return request;
     }
     
     // Get as many pages as needed
-    NSArray *entities;
-    NSMutableArray *records = [[[NSMutableArray alloc] init] autorelease];
-    NSArray *returnRecords = records;
-    NSDictionary *result = [self _callRpcWithMethod:@"read" andParams:params];
-    entities = [result objectForKey:@"entities"];
-    while (entities) {
-        [records addObjectsFromArray:entities];
-        if (limit && ([records count] >= limit)) {
-            returnRecords = [records subarrayWithRange:NSMakeRange(0, limit)];
-            break;
+    ShotgunRequest *request = [self _requestWithMethod:@"read" andParams:params];
+    ShotgunPostProcessBlock oldPost = [request postProcessBlock];
+    [request setPostProcessBlock:^id (NSDictionary *headers, NSString *body) {
+        NSDictionary *result = oldPost(headers, body);
+        NSArray *entities = [result objectForKey:@"entities"];
+        NSMutableArray *records = [[[NSMutableArray alloc] init] autorelease];
+        NSArray *returnRecords = records;
+        while (entities) {
+            [records addObjectsFromArray:entities];
+            if (limit && ([records count] >= limit)) {
+                returnRecords = [[records subarrayWithRange:NSMakeRange(0, limit)] autorelease];
+                break;
+            }
+            // result['paging_info']['entity_count'] == len(records)
+            if ([[[result objectForKey:@"paging_info"] objectForKey:@"entity_count"] unsignedIntegerValue] == [records count])
+                break;
+            NSNumber *currentPage = [[params objectForKey:@"paging"] objectForKey:@"current_page"];
+            NSNumber *nextPage = [[[NSNumber alloc] initWithUnsignedInteger:[currentPage unsignedIntegerValue]+1] autorelease];
+            [[params objectForKey:@"paging"] setObject:nextPage forKey:@"current_page"];
+            ShotgunRequest *nextPageRequest = [self _requestWithMethod:@"read" andParams:params];
+            [nextPageRequest startSynchronous];
+            result = [nextPageRequest response];
         }
-        // result['paging_info']['entity_count'] == len(records)
-        if ([[[result objectForKey:@"paging_info"] objectForKey:@"entity_count"] unsignedIntegerValue] == [records count])
-            break;
-        NSNumber *currentPage = [[params objectForKey:@"paging"] objectForKey:@"current_page"];
-        NSNumber *nextPage = [[[NSNumber alloc] initWithUnsignedInteger:[currentPage unsignedIntegerValue]+1] autorelease];
-        [[params objectForKey:@"paging"] setObject:nextPage forKey:@"current_page"];
-        result = [self _callRpcWithMethod:@"read" andParams:params];
-    }
-    return [self _parseRecords:returnRecords];
+        return [self _parseRecords:returnRecords];
+    }];
+    return request;
 }
 
 #pragma mark Modify Information
-- (ShotgunEntity *)createEntityOfType: (NSString *)entityType withData:(id)data
+
+- (ShotgunRequest *)createEntityOfType:(NSString *)entityType withData:(id)data
 {
     return [self createEntityOfType:entityType withData:data returnFields:Nil];
 }
 
-- (ShotgunEntity *)createEntityOfType: (NSString *)entityType withData:(id)data returnFields:(id)returnFields
+- (ShotgunRequest *)createEntityOfType:(NSString *)entityType withData:(id)data returnFields:(id)returnFields
 {
     NSArray *argFields = returnFields;
     if (argFields == Nil)
         argFields = [[[NSArray alloc] initWithObjects:@"id", nil] autorelease];
     NSDictionary *params = [[[NSDictionary alloc] initWithObjectsAndKeys:
                                 entityType, @"type",
-                                [self _listFromObj: data], @"fields",
+                                [self _listFromObj:data], @"fields",
                                 argFields, @"return_fields",
                              nil] autorelease];
-    NSDictionary *record = [self _callRpcWithMethod:@"create" andParams:params includeScriptName:YES returnFirst:YES];
-    return [[self _parseRecords:record] objectAtIndex:0];
+    ShotgunRequest *request = [self _requestWithMethod:@"create" params:params includeScriptName:YES returnFirst:YES];
+    ShotgunPostProcessBlock oldPost = [request postProcessBlock];
+    [request setPostProcessBlock:^id (NSDictionary *requests, NSString *body) {
+        id records = oldPost(requests, body);
+        return [[self _parseRecords:records] objectAtIndex:0];
+    }];
+    return request;
 }
 
-- (ShotgunEntity *)updateEntityOfType: (NSString *)entityType withId:(NSNumber *)entityId withData:(id)data
+- (ShotgunRequest *)updateEntityOfType:(NSString *)entityType withId:(NSNumber *)entityId withData:(id)data
 {
     NSDictionary *params = [[[NSDictionary alloc] initWithObjectsAndKeys:
                                 entityType, @"type",
                                 entityId, @"id",
-                                [self _listFromObj: data], @"fields",
+                                [self _listFromObj:data], @"fields",
                              nil] autorelease];
-    NSDictionary *record = [self _callRpcWithMethod:@"update" andParams:params];
-    return [[self _parseRecords:record] objectAtIndex:0];
+    ShotgunRequest *request = [self _requestWithMethod:@"update" andParams:params];
+    ShotgunPostProcessBlock oldPost = [request postProcessBlock];
+    [request setPostProcessBlock:^id (NSDictionary *requests, NSString *body) {
+        id records = oldPost(requests, body);
+        return [[self _parseRecords:records] objectAtIndex:0];
+    }];
+    return request;
 }
 
-- (BOOL)deleteEntityOfType: (NSString *)entityType withId:(NSNumber *)entityId
+- (ShotgunRequest *)deleteEntityOfType:(NSString *)entityType withId:(NSNumber *)entityId
 {
     NSDictionary *params = [[[NSDictionary alloc] initWithObjectsAndKeys:
                                 entityType, @"type",
                                 entityId, @"id",
                              nil] autorelease];
-    return [(NSNumber *)[self _callRpcWithMethod:@"delete" andParams:params] boolValue];
+    return [self _requestWithMethod:@"delete" andParams:params];
 }
 
-- (BOOL)reviveEntityOfType: (NSString *)entityType withId:(NSNumber *)entityId
+- (ShotgunRequest *)reviveEntityOfType:(NSString *)entityType withId:(NSNumber *)entityId
 {
     NSDictionary *params = [[[NSDictionary alloc] initWithObjectsAndKeys:
                                 entityType, @"type",
                                 entityId, @"id",
                              nil] autorelease];
-    return [(NSNumber *)[self _callRpcWithMethod:@"revive" andParams:params] boolValue];
+    return [self _requestWithMethod:@"revive" andParams:params];
 }
 
-- (NSArray *)batch:(id)requests
+- (ShotgunRequest *)batch:(id)requests
 {
     NSMutableArray *calls = [[[NSMutableArray alloc] init] autorelease];
     for (NSDictionary *request in requests) {
@@ -315,41 +377,47 @@
             [NSException raise:@"Shotgun Error" format:@"Invalid requestType '%@' for batch", requestType];
         }
     }
-    id records = [self _callRpcWithMethod:@"batch" andParams:calls];
-    return [self _parseRecords:records];
+    ShotgunRequest *request = [self _requestWithMethod:@"batch" andParams:calls];
+    ShotgunPostProcessBlock oldPost = [request postProcessBlock];
+    [request setPostProcessBlock:^id (NSDictionary *requests, NSString *body) {
+        id records = oldPost(requests, body);
+        return [self _parseRecords:records];
+    }];
+    return request;
 }
 
 #pragma mark Meta Schema
-- (NSDictionary *)schemaEntityRead
+
+- (ShotgunRequest *)schemaEntityRead
 {
-    return [self _callRpcWithMethod:@"schema_entity_read" andParams:Nil];
+    return [self _requestWithMethod:@"schema_entity_read" andParams:Nil];
 }
 
-- (NSDictionary *)schemaRead 
+- (ShotgunRequest *)schemaRead 
 {
-    return [self _callRpcWithMethod:@"schema_read" andParams:Nil];
+    return [self _requestWithMethod:@"schema_read" andParams:Nil];
 }
 
-- (NSDictionary *)schemaFieldReadForEntityOfType: (NSString *)entityType 
+- (ShotgunRequest *)schemaFieldReadForEntityOfType:(NSString *)entityType 
 {
     return [self schemaFieldReadForEntityOfType:entityType forField:Nil];
 }
 
-- (NSDictionary *)schemaFieldReadForEntityOfType: (NSString *)entityType forField:(NSString *)fieldName 
+- (ShotgunRequest *)schemaFieldReadForEntityOfType:(NSString *)entityType forField:(NSString *)fieldName 
 {
     NSMutableDictionary *params = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:entityType, @"type", nil] autorelease];
     if (fieldName != Nil)
         [params setObject:fieldName forKey:@"field_name"];
-    return [self _callRpcWithMethod:@"schema_field_read" andParams:params];
+    return [self _requestWithMethod:@"schema_field_read" andParams:params];
 }
 
-- (NSString *)schemaFieldCreateForEntityOfType:(NSString *)entityType ofDataType:(NSString *)dataType 
+- (ShotgunRequest *)schemaFieldCreateForEntityOfType:(NSString *)entityType ofDataType:(NSString *)dataType 
                                withDisplayName:(NSString *)displayName
 {
     return [self schemaFieldCreateForEntityOfType:entityType ofDataType:dataType withDisplayName:displayName andProperties:Nil];
 }
 
-- (NSString *)schemaFieldCreateForEntityOfType:(NSString *)entityType ofDataType:(NSString *)dataType
+- (ShotgunRequest *)schemaFieldCreateForEntityOfType:(NSString *)entityType ofDataType:(NSString *)dataType
                                withDisplayName:(NSString *)displayName andProperties:(id)properties
 {
     NSMutableArray *propertiesParam = [[[NSMutableArray alloc] initWithObjects:
@@ -366,31 +434,31 @@
                                 dataType, @"data_type",
                                 propertiesParam, @"properties",
                              nil] autorelease];
-    return (NSString *)[self _callRpcWithMethod:@"schema_field_create" andParams:params];
+    return [self _requestWithMethod:@"schema_field_create" andParams:params];
 }
 
-- (BOOL)schemaFieldUpdateForEntityOfType:(NSString *)entityType forField:(NSString *)fieldName withProperties:(NSDictionary *)properties
+- (ShotgunRequest *)schemaFieldUpdateForEntityOfType:(NSString *)entityType forField:(NSString *)fieldName withProperties:(NSDictionary *)properties
 {
     NSDictionary *params = [[[NSDictionary alloc] initWithObjectsAndKeys:
                                 entityType, @"type",
                                 fieldName, @"field_name",
                                 [self _listFromObj:properties withKeyName:@"property_name" andValueName:@"value"], @"properties",
                             nil] autorelease];
-    return [(NSNumber *)[self _callRpcWithMethod:@"schema_field_update" andParams:params] boolValue];
+    return [self _requestWithMethod:@"schema_field_update" andParams:params];
 }
 
-- (BOOL)schemaFieldDeleteForEntityOfType:(NSString *)entityType forField:(NSString *)fieldName 
+- (ShotgunRequest *)schemaFieldDeleteForEntityOfType:(NSString *)entityType forField:(NSString *)fieldName 
 {
     NSDictionary *params = [[[NSDictionary alloc] initWithObjectsAndKeys:
                                 entityType, @"type",
                                 fieldName, @"field_name",
                              nil] autorelease];
-    return [(NSNumber *)[self _callRpcWithMethod:@"schema_field_delete" andParams:params] boolValue];    
+    return [self _requestWithMethod:@"schema_field_delete" andParams:params];
 }
 
 - (void)setSessionUuid:(NSString *)uuid
 {
-    myConfig.sessionUuid = uuid;
+    _config.sessionUuid = uuid;
 }
 
 #pragma mark Upload and Download Files
@@ -405,7 +473,7 @@
     return [self uploadForEntityOfType:entityType withId:entityId fromPath:path forField:Nil withDisplayName:Nil andTagList:Nil];    
 }
 
-- (NSNumber *)uploadForEntityOfType: (NSString *)entityType withId:(NSNumber *)entityId fromPath:(NSString *)path forField:(NSString *)fieldName
+- (NSNumber *)uploadForEntityOfType:(NSString *)entityType withId:(NSNumber *)entityId fromPath:(NSString *)path forField:(NSString *)fieldName
                     withDisplayName:(NSString *)displayName andTagList:(NSString *)tagList
 {
     path = [path stringByExpandingTildeInPath];
@@ -417,12 +485,12 @@
     NSURL *url;
     ASIFormDataRequest *request;
     if (isThumbnail) {
-        url = [[NSURL alloc] initWithScheme:myConfig.scheme host:myConfig.server path:@"/upload/publish_thumbnail"];
+        url = [[NSURL alloc] initWithScheme:_config.scheme host:_config.server path:@"/upload/publish_thumbnail"];
         request = [ASIFormDataRequest requestWithURL:url];
         [url release];
         [request setFile:path forKey:@"thumb_image"];
     } else {
-        url = [[NSURL alloc] initWithScheme:myConfig.scheme host:myConfig.server path:@"/upload/upload_file"];
+        url = [[NSURL alloc] initWithScheme:_config.scheme host:_config.server path:@"/upload/upload_file"];
         request = [ASIFormDataRequest requestWithURL:url];
         [url release];
         if (displayName == Nil)
@@ -436,10 +504,10 @@
     
     [request setPostValue:entityType forKey:@"entity_type"];
     [request setPostValue:entityId forKey:@"entity_id"];
-    [request setPostValue:myConfig.scriptName forKey:@"script_name"];
-    [request setPostValue:myConfig.apiKey forKey:@"script_key"];
-    if (myConfig.sessionUuid != Nil)
-        [request setPostValue:myConfig.sessionUuid forKey:@"session_uuid"];
+    [request setPostValue:_config.scriptName forKey:@"script_name"];
+    [request setPostValue:_config.apiKey forKey:@"script_key"];
+    if (_config.sessionUuid != Nil)
+        [request setPostValue:_config.sessionUuid forKey:@"session_uuid"];
 
     [request setPostFormat:ASIMultipartFormDataPostFormat];
     [request startSynchronous];
@@ -462,12 +530,12 @@
     return resultId;
 }
 
-- (NSData *)downloadAttachmentWithId: (NSNumber *)attachmentId
+- (NSData *)downloadAttachmentWithId:(NSNumber *)attachmentId
 {
     NSString *sessionId = [self _getSessionToken];
     
     NSString *path = [[NSString alloc] initWithFormat:@"/file_serve/%@", attachmentId];
-    NSURL *url = [[NSURL alloc] initWithScheme:myConfig.scheme host:myConfig.server path:path];
+    NSURL *url = [[NSURL alloc] initWithScheme:_config.scheme host:_config.server path:path];
     [path release];
     ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
     [url release];
@@ -477,7 +545,7 @@
     [properties setValue:@"0" forKey:NSHTTPCookieVersion];
     [properties setValue:@"_session_id" forKey:NSHTTPCookieName];
     [properties setValue:sessionId forKey:NSHTTPCookieValue];
-    [properties setValue:myConfig.server forKey:NSHTTPCookieDomain];
+    [properties setValue:_config.server forKey:NSHTTPCookieDomain];
     [properties setValue:@"/" forKey:NSHTTPCookiePath];
     NSHTTPCookie *cookie = [[[NSHTTPCookie alloc] initWithProperties:properties] autorelease];
     [request setUseCookiePersistence:NO];
@@ -486,7 +554,7 @@
     NSError *error = [request error];
     if (error)
         [NSException raise:@"Shotgun Error" format:@"Failed to open %@, with code: %@ and message %@",
-         url, [request responseStatusCode], [request responseStatusMessage]];
+         url, [error code], [error description]];
     return [request responseData];
 }
 
@@ -494,163 +562,15 @@
 
 - (void)dealloc 
 {
-    [myClientCaps release];
-    [myServerCaps release];
-    [myConfig release];
+    [_clientCaps release];
+    [_serverCaps release];
+    [_config release];
     [super dealloc];
 }
 
-#pragma mark - Internal Methods
+#pragma mark - Private Category Methods
 
-- (NSString *)_getSessionToken {
-    if (myConfig.sessionToken != Nil)
-        return myConfig.sessionToken;
-    
-    NSDictionary *results = [self _callRpcWithMethod:@"get_session_token" andParams:Nil];
-    NSString *sessionToken = [results objectForKey:@"session_id"];
-    if (sessionToken == Nil)
-        [NSException raise:@"Shotgun Error" format:@"Could not extract session_id from %@", results];
-    myConfig.sessionToken = sessionToken;
-    return myConfig.sessionToken;
-}
-
-- (NSDictionary *)_callRpcWithMethod: (NSString *)method andParams:(id)params
-{
-    return [self _callRpcWithMethod:method andParams:params includeScriptName:YES returnFirst:NO];
-}
-
-- (NSDictionary *)_callRpcWithMethod: (NSString *)method andParams:(NSDictionary *)params 
-                   includeScriptName:(BOOL) includeScriptName returnFirst:(BOOL)first
-{
-    NSLog(@"Starting rpc call to %@ with params %@", method, params);
-    NSDictionary *paramsTransformed = [self _transformOutboundWithData: params];
-    NSDictionary *payload = [self _buildPayloadWithMethod:method andParams:paramsTransformed includeScriptName:includeScriptName];
-    NSString *encodedPayload = [self _encodePayload: payload];
-    NSDictionary *reqHeaders = [NSDictionary dictionaryWithObjectsAndKeys:
-                                    @"content-type", @"application/json; charset=utf-8",
-                                nil];
-    // Make the request
-    NSInteger responseStatus;
-    NSDictionary *responseHeaders;
-    NSString *responseBody;
-    [self _makeCallWithPath:myConfig.apiPath 
-                    andBody:encodedPayload 
-                 andHeaders:reqHeaders andHTTPMethod:@"POST" 
-             responseStatus:&responseStatus 
-            responseHeaders:&responseHeaders 
-               responseBody:&responseBody];
-    NSLog(@"Completed rpc call to %@", method);
-    if (responseStatus > 300)
-        [NSException raise:@"HTTP Error" 
-                    format:@"HTTP Error from server %d %@", responseStatus, [NSHTTPURLResponse localizedStringForStatusCode:responseStatus]];
-    id response = [self _decodeResponseWithHeaders:responseHeaders andBody:responseBody];
-    [self _responseErrors: response];
-    id transformedResponse = [self _transformInboundWithData:response];
-    
-    if ([transformedResponse isKindOfClass:[NSDictionary class]]) {
-        id results = [(NSDictionary *)transformedResponse objectForKey:@"results"];
-        if (results == Nil)
-            return transformedResponse;
-        if (first && [results isKindOfClass:[NSArray class]])
-            return [(NSArray *)results objectAtIndex:0];
-        return results;
-    }
-    return transformedResponse;    
-}
-
-- (id)_visitData:(id)data withVisitor:(id (^)(id))visitor {
-    if (data == Nil)
-        return Nil;
-    if ([data isKindOfClass:[NSArray class]]) {
-        NSMutableArray *ret = [[[NSMutableArray alloc] init] autorelease];
-        for (id value in data)
-            [ret addObject:[self _visitData:value withVisitor:visitor]];
-        return ret;
-    }
-    if ([data isKindOfClass:[NSDictionary class]]) {
-        NSMutableDictionary *ret = [[[NSMutableDictionary alloc] init] autorelease];
-        for (id value in data)
-            [ret setObject:[self _visitData:[data objectForKey:value] 
-                                withVisitor:visitor]
-                    forKey:value];
-        return ret;
-    }
-    return visitor(data);
-}
-
-- (id)_transformOutboundWithData: (id)data
-{
-    id(^outboundVisitor)(id) = ^(id value) {
-        if ([value isKindOfClass:[NSDate class]]) {
-            if (!myConfig.convertDatetimesToUTC) {
-                // We are not converting to UTC, assume that NSDates are in the local
-                // timezone.  Without timezone aware objects, this'll have to do.
-                NSTimeZone* local = [NSTimeZone localTimeZone];
-                NSTimeZone* utc = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
-                
-                NSInteger sourceGMTOffset = [local secondsFromGMTForDate:value];
-                NSInteger destinationGMTOffset = [utc secondsFromGMTForDate:value];
-                NSTimeInterval interval = destinationGMTOffset - sourceGMTOffset;
-                value = [[[NSDate alloc] initWithTimeInterval:interval sinceDate:value] autorelease];
-            }
-            NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-            [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
-            NSString *ret = [formatter stringFromDate:value];
-            [formatter release];
-            return ret ? ret : value;
-        }
-        return value;
-    };
-    return [self _visitData:data withVisitor:outboundVisitor];
-}
-
-- (id)_transformInboundWithData:(id)data
-{
-    id(^inboundVisitor)(id) = ^(id value) {
-        NSLog(@"inboundVisitor: %@", value);
-        if ([value isKindOfClass:[NSString class]]) {
-            if([value length] == 20) {
-                NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-                [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
-                if (myConfig.convertDatetimesToUTC)
-                    [formatter setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
-                NSDate *date = [formatter dateFromString:value];
-                [formatter release];
-                NSLog(@"STR: %@ to date %@", value, date);
-                return date ? date : value;
-            }
-        }
-        return value;
-    };
-    return [self _visitData:data withVisitor:inboundVisitor];}
-
-- (NSDictionary *)_buildPayloadWithMethod: (NSString *)method andParams:(NSDictionary *)params includeScriptName:(BOOL)includeScriptName
-{
-    NSMutableArray *callParams = [[[NSMutableArray alloc] init] autorelease];
-    if (includeScriptName) {
-        NSMutableDictionary *authParams = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                                myConfig.scriptName, @"script_name",
-                                                myConfig.apiKey, @"script_key",
-                                           nil] autorelease];
-        if (myConfig.sessionUuid)
-            [authParams setValue:myConfig.sessionUuid forKey:@"session_uuid"];
-        [callParams addObject:authParams];
-    }
-    if (params)
-        [callParams addObject:params];
-    
-    return [[[NSDictionary alloc] initWithObjectsAndKeys:
-                method, @"method_name",
-                callParams, @"params",
-            nil] autorelease];
-}
-
-- (NSString *)_encodePayload: (NSDictionary *)payload 
-{
-    return [payload JSONRepresentation];
-}
-
-- (id)_decodeResponseWithHeaders: (NSDictionary *)headers andBody:(NSString *)body
+- (id)_decodeResponseHeaders:(NSDictionary *)headers andBody:(NSString *)body
 {
     NSString *contentType = [headers objectForKey:@"content-type"];
     if (contentType == Nil)
@@ -675,45 +595,53 @@
     }
 }
 
-- (void)_makeCallWithPath: (NSString *)path andBody:(NSString *)body andHeaders:(NSDictionary *)headers andHTTPMethod:(NSString *)method
-           responseStatus:(NSInteger *)responseStatus responseHeaders:(NSDictionary **)responseHeaders responseBody:(NSString **)responseBody
+- (NSString *)_getSessionToken {
+    if (_config.sessionToken != Nil)
+        return _config.sessionToken;
+    
+    ShotgunRequest *request = [self _requestWithMethod:@"get_session_token" andParams:Nil];
+    [request startSynchronous];
+    NSDictionary *results = [request response];
+    NSString *sessionToken = [results objectForKey:@"session_id"];
+    if (sessionToken == Nil)
+        [NSException raise:@"Shotgun Error" format:@"Could not extract session_id from %@", results];
+    _config.sessionToken = sessionToken;
+    return _config.sessionToken;
+}
+
+- (ShotgunRequest *)_requestWithMethod:(NSString *)method andParams:(id)params
 {
-    NSMutableDictionary *reqHeaders = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                    @"shotgun-json", @"user-agent",
-                                nil] autorelease];
-    [reqHeaders addEntriesFromDictionary:headers];
-    NSURL *url = [[NSURL alloc] initWithScheme:myConfig.scheme host:myConfig.server path:path];
-    NSLog(@"Request is %@:%@", method, url);
-    NSLog(@"Request headers are %@", headers);
-    NSLog(@"Request body is %@", body);
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:myConfig.timeoutSecs];
-    [url release];
-    [request setHTTPMethod:method];
-    [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
-    [request setAllHTTPHeaderFields:headers];
-    int attempt = 0;
-    NSError *error = Nil;
-    while (attempt < myConfig.maxRpcAttempts) {
-        attempt += 1;
-        NSHTTPURLResponse *response;
-        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-        if (data == Nil)
-            continue;
-        NSString *tmpResponseBody = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
-        NSInteger tmpResponseStatus = [response statusCode];
-        NSDictionary *tmpResponseHeaders = [response allHeaderFields];
-        NSLog(@"Response status is %d %@", tmpResponseStatus, [NSHTTPURLResponse localizedStringForStatusCode:tmpResponseStatus]);
-        NSLog(@"Response headers are %@", tmpResponseHeaders);
-        NSLog(@"Response body is %@", tmpResponseBody);
-        if (responseBody)
-            *responseBody = tmpResponseBody;
-        if (responseStatus)
-            *responseStatus = [response statusCode];
-        if (responseHeaders)
-            *responseHeaders = [response allHeaderFields];
-        return;
-    }
-    [NSException raise:@"Unable to connect" format:@"%@. %@", [error localizedDescription], [error localizedFailureReason]];
+    return [self _requestWithMethod:method params:params includeScriptName:YES returnFirst:NO];
+}
+
+- (ShotgunRequest *)_requestWithMethod:(NSString *)method params:(id)params includeScriptName:(BOOL)includeScriptName returnFirst:(BOOL)first
+{
+    NSDictionary *paramsTransformed = [self _transformOutboundData:params];
+    NSDictionary *payload = [self _buildPayloadWithConfig:_config Method:method andParams:paramsTransformed includeScriptName:includeScriptName];
+    NSString *encodedPayload = [payload JSONRepresentation];
+    NSDictionary *headers = [NSDictionary dictionaryWithObject:@"application/json; charset=utf-8" forKey:@"content-type"];
+    
+    ShotgunRequest *request = 
+        [[[ShotgunRequest alloc] initWithConfig:_config 
+                                           path:_config.apiPath
+                                           body:encodedPayload 
+                                        headers:headers andHTTPMethod:@"POST"] autorelease];
+    [request setPostProcessBlock:^id (NSDictionary *headers, NSString *body) {
+        // Parse the results
+        id response = [self _decodeResponseHeaders:headers andBody:body];
+        [self _responseErrors:response];
+        id transformedResponse = [self _transformInboundData:response];
+        if ([transformedResponse isKindOfClass:[NSDictionary class]]) {
+            id results = [(NSDictionary *)transformedResponse objectForKey:@"results"];
+            if (results == Nil)
+                return transformedResponse;
+            if (first && [results isKindOfClass:[NSArray class]])
+                return [(NSArray *)results objectAtIndex:0];
+            return results;
+        }
+        return transformedResponse;
+    }];
+    return request;
 }
 
 - (NSArray *)_parseRecords:(id)records 
@@ -722,6 +650,10 @@
     if (records == Nil)
         return ret;
     NSArray *iteratee;
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    [queue setMaxConcurrentOperationCount:5];
+    queue.name = @"Thumbnail Converting Queue";
+    NSLog(@"Converting thumbs on queue: %@", queue.name);
     if (![records isKindOfClass:[NSArray class]])
         iteratee = [[[NSArray alloc] initWithObjects:records, nil] autorelease];
     else
@@ -738,45 +670,54 @@
             if (value == Nil)
                 continue;
             if ([key isEqualToString:@"image"]) {
-                [entity setValue:[self _buildThumbUrlForEntityOfType:[record objectForKey:@"type"] andId:[record objectForKey:@"id"]]
-                             forKey:@"image"];
+                [queue addOperationWithBlock:^{
+                    NSString *url = [self _buildThumbUrlForEntity:entity];
+                    if (url)
+                        [entity setObject:url forKey:@"image"];
+                    else
+                        [entity removeObjectForKey:@"image"];
+                }];
                 continue;
             }
         }
     }
+    [queue waitUntilAllOperationsAreFinished];
+    [queue release];
     return ret;
 }
 
-- (NSString *)_buildThumbUrlForEntityOfType: (NSString *)entityType andId:(NSNumber *)entityId 
+- (NSString *)_buildThumbUrlForEntity:(ShotgunEntity *)entity
 {
-    NSString *path = [[[[NSString alloc] 
-                        initWithFormat:@"/upload/get_thumbnail_url?entity_type=%@&entity_id=%@",
-                            entityType, entityId] autorelease]
-                     stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
-    NSString *body = Nil;
-    [self _makeCallWithPath:path andBody:Nil andHeaders:Nil andHTTPMethod:@"GET" responseStatus:Nil responseHeaders:Nil responseBody:&body];
+    NSString *path = [[NSString
+                       stringWithFormat:@"/upload/get_thumbnail_url?entity_type=%@&entity_id=%@", 
+                       [entity entityType], [entity entityId]]
+                      stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
+    ShotgunRequest *request = 
+        [[[ShotgunRequest alloc] initWithConfig:_config path:path body:Nil headers:Nil andHTTPMethod:@"GET"] autorelease];
+    [request startSynchronous];
+    NSString *body = [request response];
     NSArray *parts = [body componentsSeparatedByString:@"\n"];
     NSInteger code = [(NSString *)[parts objectAtIndex:0] integerValue];
     if (code == 0)
-        [NSException raise:@"Error getting thumbnail url" format:@"%@", [parts objectAtIndex:1]];
+        NSLog(@"Error getting thumbnail url for entity %@ response was '%@'", entity, body);
     if (code == 1) {
         NSString *path = [parts objectAtIndex:1];
         if ([path length] == 0)
             return Nil;
-        NSURL *url = [[[NSURL alloc] initWithScheme:myConfig.scheme host:myConfig.server path:[parts objectAtIndex:1]] autorelease];
+        NSURL *url = [[[NSURL alloc] initWithScheme:_config.scheme host:_config.server path:[parts objectAtIndex:1]] autorelease];
         return [url absoluteString];
         
     }
-    [NSException raise:@"Error getting thumbnail url" format:@"Unknown code %d %@", code, [parts objectAtIndex:1]];
-    return (NSString *)-1;
+    NSLog(@"Error getting thumbnail url: Unknown code %d %@", code, parts);
+    return Nil;
 }
 
--(NSArray *)_listFromObj: (id)obj
+-(NSArray *)_listFromObj:(id)obj
 {
     return [self _listFromObj:obj withKeyName:@"field_name" andValueName:@"value"];       
 }
 
-- (NSArray *)_listFromObj: (id)obj withKeyName: (NSString *)keyName andValueName: (NSString *)valueName 
+- (NSArray *)_listFromObj:(id)obj withKeyName:(NSString *)keyName andValueName:(NSString *)valueName 
 {
     NSMutableArray *ret = [[[NSMutableArray alloc] init] autorelease];
     if (obj == Nil)
@@ -792,6 +733,80 @@
                             [checkedObj objectForKey:key], valueName,
                         nil] autorelease]];
     return ret;
+}
+
+- (NSDictionary *)_buildPayloadWithConfig:(ShotgunConfig *)config Method:(NSString *)method andParams:(NSDictionary *)params includeScriptName:(BOOL)includeScriptName
+{
+    NSMutableArray *callParams = [[[NSMutableArray alloc] init] autorelease];
+    if (includeScriptName) {
+        NSMutableDictionary *authParams = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                            config.scriptName, @"script_name",
+                                            config.apiKey, @"script_key",
+                                            nil] autorelease];
+        if (config.sessionUuid)
+            [authParams setValue:config.sessionUuid forKey:@"session_uuid"];
+        [callParams addObject:authParams];
+    }
+    if (params)
+        [callParams addObject:params];
+    
+    return [[[NSDictionary alloc] initWithObjectsAndKeys:
+             method, @"method_name",
+             callParams, @"params",
+             nil] autorelease];
+}
+
+- (id)_transformOutboundData:(id)data
+{
+    id(^outboundVisitor)(id) = ^(id value) {
+        if ([value isKindOfClass:[NSDate class]]) {
+            NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+            [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+            NSString *ret = [formatter stringFromDate:value];
+            [formatter release];
+            return ret ? ret : value;
+        }
+        return value;
+    };
+    return [self _visitData:data withVisitor:outboundVisitor];
+}
+
+- (id)_transformInboundData:(id)data
+{
+    id(^inboundVisitor)(id) = ^(id value) {
+        if ([value isKindOfClass:[NSString class]]) {
+            if([value length] == 20) {
+                NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+                [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+                NSDate *date = [formatter dateFromString:value];
+                [formatter release];
+                return date ? date : value;
+            }
+        }
+        return value;
+    };
+    return [self _visitData:data withVisitor:inboundVisitor];
+}
+
+- (id)_visitData:(id)data withVisitor:(id (^)(id))visitor
+{
+    if (data == Nil)
+        return Nil;
+    if ([data isKindOfClass:[NSArray class]]) {
+        NSMutableArray *ret = [[[NSMutableArray alloc] init] autorelease];
+        for (id value in data)
+            [ret addObject:[self _visitData:value withVisitor:visitor]];
+        return ret;
+    }
+    if ([data isKindOfClass:[NSDictionary class]]) {
+        NSMutableDictionary *ret = [[[NSMutableDictionary alloc] init] autorelease];
+        for (id value in data)
+            [ret setObject:[self _visitData:[data objectForKey:value] 
+                                withVisitor:visitor]
+                    forKey:value];
+        return ret;
+    }
+    return visitor(data);
 }
 
 @end

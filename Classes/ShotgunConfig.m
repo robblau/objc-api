@@ -1,19 +1,18 @@
 //
-//  Config.m
+//  ShotgunConfig.m
 //  ShotgunApi
 //
 //  Created by Rob Blau on 6/8/11.
 //  Copyright 2011 Laika. All rights reserved.
 //
 
-#import "Config.h"
+#import "ShotgunConfig.h"
 
-@implementation Config
+@implementation ShotgunConfig
 
 @synthesize maxRpcAttempts;
 @synthesize timeoutSecs;
 @synthesize apiVer;
-@synthesize convertDatetimesToUTC;
 @synthesize recordsPerPage;
 @synthesize apiKey;
 @synthesize scriptName;
@@ -29,7 +28,6 @@
         maxRpcAttempts = 3;
         timeoutSecs = 3;
         apiVer = [[NSString alloc] initWithString:@"api3"];
-        convertDatetimesToUTC = TRUE;
         recordsPerPage = 500;
         apiKey = Nil;
         scriptName = Nil;
@@ -44,6 +42,7 @@
 }
 
 - (void)dealloc {
+    [apiVer release];
     [super dealloc];
 }
 

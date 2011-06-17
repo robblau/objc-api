@@ -34,7 +34,14 @@
     detailViewController.shotgun = shotgun;
 
     // Pull down all the projects from the servers
-    projects = [[shotgun findEntitiesOfType:@"Project" withFilters:@"[]" andFields:@"[\"name\", \"image\"]"] retain];
+    projects = [[NSArray alloc] init];
+    ShotgunRequest *request = [shotgun findEntitiesOfType:@"Project" withFilters:@"[]" andFields:@"[\"name\", \"image\"]"];
+    [request setCompletionBlock:^{
+        [projects release];
+        projects = [[request response] retain];        
+        [[self tableView] reloadData];
+    }];
+    [request startAsynchronous];
 }
 
 		
@@ -86,8 +93,10 @@
     // Configure the cell.  Standard table cell with the name of the project and its thumbnail.
     NSDictionary *project = [projects objectAtIndex:[indexPath row]];
     [[cell textLabel] setText:[project objectForKey:@"name"]];
-    if ([project objectForKey:@"image"]) {
-        UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[project objectForKey:@"image"]]]];
+    if (![[project objectForKey:@"image"] isEqual:[NSNull null]]) {
+        NSLog(@"Loading image at: '%@'", [project objectForKey:@"image"]);
+        NSURL *url = [NSURL URLWithString:[project objectForKey:@"image"]];
+        UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:url]];
         [[cell imageView] setImage:image];        
     }
     

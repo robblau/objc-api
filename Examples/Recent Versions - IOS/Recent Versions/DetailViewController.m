@@ -33,16 +33,20 @@
         _detailItem = [newDetailItem retain];
         
         // Detail item is the selected Project, grab the 50 latest versions in that project
-        [versions release];
-        versions = [[shotgun findEntitiesOfType:@"Version"
+        versions = [[NSArray alloc] init];
+        ShotgunRequest *request = [[shotgun findEntitiesOfType:@"Version"
                                     withFilters:[NSString stringWithFormat:
                                                  @"[[\"project\", \"is\", {\"type\": \"Project\", \"id\": %@}]]",
                                                  [_detailItem entityId]]
                                       andFields:@"[\"code\", \"sg_status_list\", \"image\", \"created_at\"]" 
                                        andOrder:@"[{\"field_name\": \"created_at\", \"direction\": \"desc\"}]"
-                              andFilterOperator:Nil andLimit:50 andPage:0 retiredOnly:NO] retain];
-        // Clear the table and reload with the new data
-        [versionsTable reloadData];
+                              andFilterOperator:Nil andLimit:80 andPage:0 retiredOnly:NO] retain];
+        [request setCompletionBlock:^{
+            [versions release];
+            versions = [[request response] retain];
+            [versionsTable reloadData];
+        }];
+        [request startAsynchronous];
     }
 }
 
@@ -126,15 +130,19 @@
             // Have cached thumbnail
             [[[cell images] objectAtIndex:x] setImage:thumbnail];
         } else {
-            // Need to download the thumbnail, use an asyncronous request to
-            // do it in the background
-            __block ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:[version objectForKey:@"image"]]];
-            [request setCompletionBlock:^{
-                UIImage *thumbnail = [UIImage imageWithData:[request responseData]];
-                [imageMap setObject:thumbnail forKey:[version objectForKey:@"image"]];
-                [[[cell images] objectAtIndex:x] setImage:thumbnail];
-            }];
-            [request startAsynchronous];
+            [[[cell images] objectAtIndex:x] setImage:Nil];
+            if ([version objectForKey:@"image"]) {
+                // Need to download the thumbnail, use an asyncronous request to
+                // do it in the background
+                __block ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:[version objectForKey:@"image"]]];
+                [[request queue] setMaxConcurrentOperationCount:5];
+                [request setCompletionBlock:^{
+                    UIImage *thumbnail = [UIImage imageWithData:[request responseData]];
+                    [imageMap setObject:thumbnail forKey:[version objectForKey:@"image"]];
+                    [[[cell images] objectAtIndex:x] setImage:thumbnail];
+                }];
+                [request startAsynchronous];
+            }
         }
     }
     [formatter release];

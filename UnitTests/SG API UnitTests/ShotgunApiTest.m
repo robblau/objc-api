@@ -31,13 +31,17 @@
 
 - (void)testSchemaEntityRead 
 {
-    NSDictionary *entities = [shotgun schemaEntityRead];
+    ShotgunRequest *req = [shotgun schemaEntityRead];
+    [req startSynchronous];
+    NSDictionary *entities = [req response];
     GHAssertNotNil([entities objectForKey:@"Shot"], @"Shot entity not found in schemaEntityRead");
 }
 
 - (void)testInfo
 {
-    NSDictionary *info = [shotgun info];
+    ShotgunRequest *req = [shotgun info];
+    [req startSynchronous];
+    NSDictionary *info = [req response];
     GHAssertNotNil([info objectForKey:@"version"], @"version key not found in info dict");
 }
 
@@ -49,24 +53,32 @@
         \"description\": \"This template should be retired by the unit tests if everything goes well.\", \
         \"entity_type\": \"Shot\" \
     }";
-    ShotgunEntity *template = [shotgun createEntityOfType:@"TaskTemplate" withData:data];
+    ShotgunRequest *request1 = [shotgun createEntityOfType:@"TaskTemplate" withData:data];
+    [request1 startSynchronous];
+    ShotgunEntity *template = [request1 response];
     GHAssertTrue([template entityId] != 0, @"return id of Task Template was Nil");
     // Update
     NSString *updateData = @"{ \
         \"description\": \"Updated description.  Delete Next.\" \
     }";
-    ShotgunEntity *updatedTemplate = [shotgun updateEntityOfType:@"TaskTemplate" withId:[template entityId] withData:updateData];
+    ShotgunRequest *request2 = [shotgun updateEntityOfType:@"TaskTemplate" withId:[template entityId] withData:updateData];
+    [request2 startSynchronous];
+    ShotgunEntity *updatedTemplate = [request2 response];
     GHAssertEqualStrings([updatedTemplate valueForKey:@"description"], @"Updated description.  Delete Next.", @"Description not updated");
     // Delete
-    BOOL result = [shotgun deleteEntityOfType:@"TaskTemplate" withId:[template entityId]];
+    ShotgunRequest *request3 = [shotgun deleteEntityOfType:@"TaskTemplate" withId:[template entityId]];
+    [request3 startSynchronous];
+    BOOL result = [[request3 response] boolValue];
     GHAssertTrue(result, @"delete for Task Template returned False");
 }
 
 - (void)testFind 
 {
-    NSArray *results = [shotgun findEntitiesOfType:@"Shot"
+    ShotgunRequest *request = [shotgun findEntitiesOfType:@"Shot"
                                        withFilters:@"[[\"sg_status_list\", \"is\", \"ip\"]]"
-                        andFields:@"[\"sg_status_list\", \"code\", \"image\", \"sg_status_list\"]"];
+                        andFields:@"[\"sg_status_list\", \"code\", \"created_at\", \"image\", \"sg_status_list\"]"];
+    [request startSynchronous];
+    NSArray *results = [request response];
     GHTestLog(@"Find returned: %@", results);
 }
 
