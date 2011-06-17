@@ -29,7 +29,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li id="searchli">
@@ -56,7 +55,41 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">Shotgun API </div>  </div>
 </div>
 <div class="contents">
-<div class="textblock"><h2><a class="anchor" id="Introduction"></a>
+<div class="textblock"><h2><a class="anchor" id="toc"></a>
+Table of Contents</h2>
+<ul>
+<li>
+<a class="el" href="index.html#Introduction">Introduction</a> </li>
+<li>
+<a class="el" href="index.html#Installation">Installation</a> </li>
+<li>
+<a class="el" href="index.html#Notes">Notes</a> </li>
+<li>
+<a class="el" href="index.html#details">API Details</a> <ul>
+<li>
+<a class="el" href="index.html#connecting">Connecting to Shotgun</a> </li>
+<li>
+<a class="el" href="index.html#finding">Finding entities</a> </li>
+<li>
+<a class="el" href="index.html#modifying">Creating, modifying, deleting, and reviving entities</a> </li>
+<li>
+<a class="el" href="index.html#batch">Batch operations</a> </li>
+<li>
+<a class="el" href="index.html#schema">Meta-Schema queries</a> </li>
+<li>
+<a class="el" href="index.html#files">Uploading and downloading files</a> </li>
+<li>
+<a class="el" href="index.html#requests">Using ShotgunRequest Objects</a> </li>
+</ul>
+</li>
+<li>
+<a class="el" href="index.html#TODOs">TODOs</a> </li>
+<li>
+<a class="el" href="index.html#Dependencies">Dependencies</a> </li>
+<li>
+<a class="el" href="index.html#Links">Links</a> </li>
+</ul>
+<h2><a class="anchor" id="Introduction"></a>
 Introduction</h2>
 <p>This is an objective c port of the python shotgun api.</p>
 <p>For complete documentation of how the Shotgun API works along with tutorials, examples, and other details see:<br/>
@@ -69,7 +102,15 @@ Start by downloading the code from <a href="https://github.com/robblau/objc-api"
 <li>
 Copy the files in Classes directory into your project. </li>
 <li>
-Copy the dependencies into your project (these are included in the Dependencies directory). <ul>
+Copy the dependencies into your project.<br/>
+<br/>
+ All the dependencies are included as git submodules in the Dependencies directory.<br/>
+ You can either download the dependencies yourself or (if you cloned the project via<br/>
+ git rather than downloading the tarball) run 'git submodule init' followed by<br/>
+ 'git submodule update' to download the projects at the revision as of the writing of<br/>
+ this library.<br/>
+<br/>
+ <ul>
 <li>
 <b>json-framework</b> - Copy the files in Classes into your project. </li>
 <li>
@@ -86,8 +127,13 @@ Link against CFNetwork, SystemConfiguration, MobileCoreServices, CoreGraphics an
 </li>
 </ul>
 <p>See the example project under Examples to see what the resulting setup should look like.</p>
-<h2><a class="anchor" id="API"></a>
-Details</h2>
+<h2><a class="anchor" id="Notes"></a>
+Notes</h2>
+<ul>
+<li>All NSDate objects are assumed to be in UTC (This is the default NSDate behavior).</li>
+</ul>
+<h2><a class="anchor" id="details"></a>
+API Details</h2>
 <h3><a class="anchor" id="connecting"></a>
 Connecting to Shotgun</h3>
 <div class="fragment"><pre class="fragment">   NSString *url = <span class="stringliteral">@&quot;http://mysite.shotgunsoftware.com&quot;</span>;
@@ -96,22 +142,32 @@ Connecting to Shotgun</h3>
    <a class="code" href="interface_shotgun.html" title="Represents a connection to a shotgun server.">Shotgun</a> *shotgun = [[[<a class="code" href="interface_shotgun.html" title="Represents a connection to a shotgun server.">Shotgun</a> alloc] initWithUrl:url scriptName:script andKey:key] autorelease];
 </pre></div><h3><a class="anchor" id="finding"></a>
 Finding entities</h3>
-<div class="fragment"><pre class="fragment">   NSArray *results =
+<div class="fragment"><pre class="fragment">   <a class="code" href="interface_shotgun_request.html" title="Represents a simple request being made to a Shotgun instance.">ShotgunRequest</a> *request = 
      [shotgun findEntityOfType:<span class="stringliteral">@&quot;Version&quot;</span>
                    withFilters:<span class="stringliteral">@&quot;[[\&quot;</span>code\<span class="stringliteral">&quot;, \&quot;starts_with\&quot;, \&quot;100\&quot;]]&quot;</span>
                      andFields:<span class="stringliteral">@&quot;[\&quot;</span>code\<span class="stringliteral">&quot;, \&quot;image\&quot;]&quot;</span>];
+   [request startSynchronous];
+   NSArray *results = [request response];
 </pre></div><h3><a class="anchor" id="modifying"></a>
 Creating, modifying, deleting, and reviving entities</h3>
-<div class="fragment"><pre class="fragment">   <a class="code" href="interface_shotgun_entity.html" title="Represents a Shotgun entity.">ShotgunEntity</a> *shot = [shotgun createEntityOfType:<span class="stringliteral">@&quot;Shot&quot;</span>
+<div class="fragment"><pre class="fragment">   <a class="code" href="interface_shotgun_request.html" title="Represents a simple request being made to a Shotgun instance.">ShotgunRequest</a> *request = [shotgun createEntityOfType:<span class="stringliteral">@&quot;Shot&quot;</span>
                                            withData:<span class="stringliteral">@&quot;{\&quot;</span>code\<span class="stringliteral">&quot;: \&quot;s10\&quot;, \&quot;description\&quot;: \&quot;Shot 10\&quot;}&quot;</span>];
-</pre></div> <div class="fragment"><pre class="fragment">   <a class="code" href="interface_shotgun_entity.html" title="Represents a Shotgun entity.">ShotgunEntity</a> *shot = [shotgun updateEntityOfType:<span class="stringliteral">@&quot;Shot&quot;</span>
+   [request startSynchronous];
+   <a class="code" href="interface_shotgun_entity.html" title="Represents a Shotgun entity.">ShotgunEntity</a> *shot = [request response];
+</pre></div> <div class="fragment"><pre class="fragment">   <a class="code" href="interface_shotgun_request.html" title="Represents a simple request being made to a Shotgun instance.">ShotgunRequest</a> *request = [shotgun updateEntityOfType:<span class="stringliteral">@&quot;Shot&quot;</span>
                                              withId:[NSNumber numberWithInt:23]
                                            withData:<span class="stringliteral">@&quot;{\&quot;</span>description\<span class="stringliteral">&quot;: \&quot;Shot 20 - More Info\&quot;}&quot;</span>];
-</pre></div> <div class="fragment"><pre class="fragment">   BOOL success = [shotgun deleteEntityOfType:<span class="stringliteral">@&quot;Shot&quot;</span> withId:[NSNumber numberWithInt:23]];
-</pre></div> <div class="fragment"><pre class="fragment">   BOOL success = [shotgun reviveEntityOfType:<span class="stringliteral">@&quot;Shot&quot;</span> withId:[NSNumber numberWithInt:23]];
+   [request startSynchronous];
+   <a class="code" href="interface_shotgun_entity.html" title="Represents a Shotgun entity.">ShotgunEntity</a> *shot = [request response];
+</pre></div> <div class="fragment"><pre class="fragment">   <a class="code" href="interface_shotgun_request.html" title="Represents a simple request being made to a Shotgun instance.">ShotgunRequest</a> *request = [shotgun deleteEntityOfType:<span class="stringliteral">@&quot;Shot&quot;</span> withId:[NSNumber numberWithInt:23]];
+   [request startSynchronous];
+   BOOL success = [[request response] boolValue];
+</pre></div> <div class="fragment"><pre class="fragment">   <a class="code" href="interface_shotgun_request.html" title="Represents a simple request being made to a Shotgun instance.">ShotgunRequest</a> *request = [shotgun reviveEntityOfType:<span class="stringliteral">@&quot;Shot&quot;</span> withId:[NSNumber numberWithInt:23]];
+   [request startSynchronous];
+   BOOL success = [[request response] boolValue];
 </pre></div><h3><a class="anchor" id="batch"></a>
 Batch operations</h3>
-<div class="fragment"><pre class="fragment">   NSArray *results = [shotgun batch:<span class="stringliteral">@&quot;[&quot;</span>   \
+<div class="fragment"><pre class="fragment">   <a class="code" href="interface_shotgun_request.html" title="Represents a simple request being made to a Shotgun instance.">ShotgunRequest</a> *request = [shotgun batch:<span class="stringliteral">@&quot;[&quot;</span> \
        <span class="stringliteral">&quot;{                                 &quot;</span> \
        <span class="stringliteral">&quot; \&quot;request_type\&quot;: \&quot;create\&quot;,    &quot;</span> \
        <span class="stringliteral">&quot; \&quot;entity_type\&quot;:  \&quot;Shot\&quot;,      &quot;</span> \
@@ -122,28 +178,55 @@ Batch operations</h3>
        <span class="stringliteral">&quot;},                                &quot;</span> \
        <span class="stringliteral">&quot;{\&quot;request_type\&quot;: \&quot;delete\&quot;, \&quot;entity_type\&quot;: \&quot;Shot\&quot;, \&quot;entity_id\&quot;: 23}&quot;</span> \
      ]<span class="stringliteral">&quot;];</span>
+<span class="stringliteral">   [request startSynchronous];</span>
+<span class="stringliteral">   NSArray *results = [request response];</span>
 </pre></div><h3><a class="anchor" id="schema"></a>
 Meta-Schema queries</h3>
-<div class="fragment"><pre class="fragment">   NSDictionary *schemaInfo = [shotgun schemaEntityRead];
-</pre></div> <div class="fragment"><pre class="fragment">   NSDictionary *schema = [shotgun schemaRead];
-</pre></div> <div class="fragment"><pre class="fragment">   NSDictionary *entitySchema = [shotgun schemaFieldReadForEntityOfType:<span class="stringliteral">@&quot;Shot&quot;</span> forField:<span class="stringliteral">@&quot;sg_status_list&quot;</span>];
+<div class="fragment"><pre class="fragment">   <a class="code" href="interface_shotgun_request.html" title="Represents a simple request being made to a Shotgun instance.">ShotgunRequest</a> *request = [shotgun schemaEntityRead];
+   [request startSynchronous];
+   NSDictionary *schemaInfo = [request response];
+</pre></div> <div class="fragment"><pre class="fragment">   <a class="code" href="interface_shotgun_request.html" title="Represents a simple request being made to a Shotgun instance.">ShotgunRequest</a> *request = [shotgun schemaRead];
+   [request startSynchronous];
+   NSDictionary *schema = [request response];
+</pre></div> <div class="fragment"><pre class="fragment">   <a class="code" href="interface_shotgun_request.html" title="Represents a simple request being made to a Shotgun instance.">ShotgunRequest</a> *request = [shotgun schemaFieldReadForEntityOfType:<span class="stringliteral">@&quot;Shot&quot;</span> forField:<span class="stringliteral">@&quot;sg_status_list&quot;</span>];
+   [request startSynchronous];
+   NSDictionary *entitySchema = [request response];
 </pre></div><h3><a class="anchor" id="files"></a>
 Uploading and downloading files</h3>
-<div class="fragment"><pre class="fragment">     NSNumber *attachmentId = [shotgun uploadThumbnailForEntityOfType:<span class="stringliteral">@&quot;Shot&quot;</span>
-                                            withId:[NSNumber numberWithInt:23]
-                                          fromPath:<span class="stringliteral">@&quot;/path/to/the/file.jpg&quot;</span>];
+<div class="fragment"><pre class="fragment">   NSNumber *attachmentId = [shotgun uploadThumbnailForEntityOfType:<span class="stringliteral">@&quot;Shot&quot;</span>
+                                          withId:[NSNumber numberWithInt:23]
+                                        fromPath:<span class="stringliteral">@&quot;/path/to/the/file.jpg&quot;</span>];
 </pre></div> <div class="fragment"><pre class="fragment">   NSData *imageData = downloadAttachmentWithId:[NSNumber numberWithInt:201];
-</pre></div><h2><a class="anchor" id="TODOs"></a>
+</pre></div><h3><a class="anchor" id="requests"></a>
+Using ShotgunRequest Objects</h3>
+<p>ShotgunRequests can be run either synchronously or asynchronously.</p>
+<p>To run a request syncronously simply call startSyncronously: </p>
+<div class="fragment"><pre class="fragment">   [request startSyncronous];
+</pre></div><p> The request will block the current thread until it is finished and its response is ready.</p>
+<p>To run a request asynchronously call startAsynchronous: </p>
+<div class="fragment"><pre class="fragment">   [request startAsynchronous];
+</pre></div><p> Control will return to the current thread right away. To process the response to the request, register callback blocks with request before starting it: </p>
+<div class="fragment"><pre class="fragment">   [request setCompletionBlock:^{
+      <span class="keywordtype">id</span> response = [request response];
+      <span class="comment">// Do Stuff with the response</span>
+   }];
+</pre></div><p>The currently supported callbacks are: </p>
+<ul>
+<li>startedBlock - Called when the request is started. </li>
+<li>completionBlock - Called when the request has finished. </li>
+<li>failedBlock - Called when the request failed.</li>
+</ul>
+<p>The postProcessBlock is used internally to the API and should not be overridden.</p>
+<h2><a class="anchor" id="TODOs"></a>
 TODOs</h2>
 <ul>
-<li>Asynchronous calls </li>
 <li>Switch from Exceptions to NSErrors </li>
-<li>Add support for responding to events via blocks and delegate SELs </li>
+<li>Add support for responding to events via delegate SELs </li>
 <li>Add support for asychronous image field resolution </li>
 <li>Better API around paging </li>
 <li>Finish documentation </li>
 <li>Round out unit tets. Use <a href="http://www.mulle-kybernetik.com/software/OCMock/">OCMock</a>. </li>
-<li><a class="el" href="todo.html">Other inline TODOs</a></li>
+<li>Other inline TODOs</li>
 </ul>
 <h2><a class="anchor" id="Dependencies"></a>
 Dependencies</h2>
@@ -173,7 +256,7 @@ Links</h2>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Wed Jun 15 2011 13:40:00 for Shotgun ObjC Api by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 17 2011 01:47:14 for Shotgun ObjC Api by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

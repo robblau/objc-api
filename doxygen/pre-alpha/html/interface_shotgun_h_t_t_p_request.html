@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>Shotgun ObjC Api: Todo List</title>
+<title>Shotgun ObjC Api: ShotgunHTTPRequest Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/search.js"></script>
@@ -29,8 +29,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li class="current"><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li id="searchli">
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -50,25 +50,53 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
+      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+    </ul>
+  </div>
 </div>
 <div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Todo List </div>  </div>
+<div class="title">ShotgunHTTPRequest Class Reference</div>  </div>
 </div>
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="_todo000001"></a> </p>
-<dl>
-<dt>Class <a class="el" href="interface_shotgun.html">Shotgun</a>  </dt>
-<dd><p class="startdd">Implement Authentication </p>
-<p>Switch to returning <a class="el" href="interface_shotgun_request.html" title="Represents a simple request being made to a Shotgun instance.">ShotgunRequest</a> objects for async </p>
-<p>Figure out a way to do image url lookup in the background </p>
-<p>Get rid of option to not use UTC dates </p>
-<p>Figure out how to handle date fields </p>
-<p>Move private methods to a category </p>
-<p class="enddd">Finish support for local paths </p>
-</dd>
-</dl>
-</div></div>
+<!-- doxytag: class="ShotgunHTTPRequest" -->
+<p>Represents a simple request being made to a Shotgun instance.  
+ <a href="interface_shotgun_h_t_t_p_request.html#details">More...</a></p>
+
+<p><code>#import &lt;<a class="el" href="_shotgun_request_8h_source.html">ShotgunRequest.h</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for ShotgunHTTPRequest:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="interface_shotgun_h_t_t_p_request.png" usemap="#ShotgunHTTPRequest_map" alt=""/>
+  <map id="ShotgunHTTPRequest_map" name="ShotgunHTTPRequest_map">
+<area href="interface_shotgun_j_s_o_n_request.html" title="Represents a JSON request being made to a Shotgun instance." alt="ShotgunJSONRequest" shape="rect" coords="0,56,142,80"/>
+<area href="interface_shotgun_entities_request.html" title="Represents a request being made to a Shotgun instance returning entity information." alt="ShotgunEntitiesRequest" shape="rect" coords="0,112,142,136"/>
+</map>
+ </div></div>
+
+<p><a href="class_shotgun_h_t_t_p_request-members.html">List of all members.</a></p>
+<table class="memberdecls">
+<tr><td colspan="2"><h2><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a058ca9995d8d8abbf05b1e0fff50b7e8"></a><!-- doxytag: member="ShotgunHTTPRequest::initWithConfig:path:body:headers:andHTTPMethod:" ref="a058ca9995d8d8abbf05b1e0fff50b7e8" args="(ShotgunConfig *config,[path] NSString *path,[body] NSString *body,[headers] NSDictionary *headers,[andHTTPMethod] NSString *method)" -->
+(id)&#160;</td><td class="memItemRight" valign="bottom">- <a class="el" href="interface_shotgun_h_t_t_p_request.html#a058ca9995d8d8abbf05b1e0fff50b7e8">initWithConfig:path:body:headers:andHTTPMethod:</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">foo <br/></td></tr>
+</table>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>Represents a simple request being made to a Shotgun instance. </p>
+</div><hr/>The documentation for this class was generated from the following files:<ul>
+<li>/Users/rblau/Desktop/Projects/objc-api/pre-alpha/Classes/<a class="el" href="_shotgun_request_8h_source.html">ShotgunRequest.h</a></li>
+<li>/Users/rblau/Desktop/Projects/objc-api/pre-alpha/Classes/ShotgunRequest.m</li>
+</ul>
+</div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -83,7 +111,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Thu Jun 16 2011 21:29:04 for Shotgun ObjC Api by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Wed Jun 15 2011 18:25:34 for Shotgun ObjC Api by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
