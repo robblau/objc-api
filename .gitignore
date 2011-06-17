@@ -1,0 +1,26 @@
+# Project files to ignore
+/UnitTests/SG API UnitTests/Config.plist
+/Examples/Recent Versions - IOS/Recent Versions/Config.plist
+
+# xcode noise
+*.mode1v3
+*.mode2v3
+*.pbxuser
+*.perspective 
+*.perspectivev3
+*.pyc 
+*~.nib/
+build/*
+xcuserdata
+
+# Standard editor cruft
+*.tm_build_errors
+*.swp
+*.swo
+
+# old skool
+.svn
+
+# osx noise
+.DS_Store
+profile
