@@ -9,32 +9,22 @@
 #import <Foundation/Foundation.h>
 
 
-@interface ShotgunConfig : NSObject {
-    NSUInteger maxRpcAttempts;
-    NSUInteger timeoutSecs;
-    NSString *apiVer;
-    NSUInteger recordsPerPage;
-    NSString *apiKey;
-    NSString *scriptName;
-    NSString *sessionUuid;
-    NSString *scheme;
-    NSString *server;
-    NSString *apiPath;
-    NSString *sessionToken;
-}
+@interface ShotgunConfig : NSObject;
 
-@property (readwrite) NSUInteger maxRpcAttempts;
-@property (readwrite) NSUInteger timeoutSecs;
-@property (retain) NSString *apiVer;
-@property (readwrite) NSUInteger recordsPerPage;
-@property (retain) NSString *apiKey;
-@property (retain) NSString *scriptName;
-@property (retain) NSString *sessionUuid;
-@property (retain) NSString *scheme;
-@property (retain) NSString *server;
-@property (retain) NSString *apiPath;
-@property (retain) NSString *sessionToken;
+@property (assign, readwrite, nonatomic) NSUInteger maxRpcAttempts;
+@property (assign, readwrite, nonatomic) NSUInteger timeoutSecs;
+@property (assign, readwrite, nonatomic) NSUInteger recordsPerPage;
+@property (retain, readwrite, nonatomic) NSString *apiVer;
+@property (retain, readwrite, nonatomic) NSString *apiKey;
+@property (retain, readwrite, nonatomic) NSString *scheme;
+@property (retain, readwrite, nonatomic) NSString *server;
+@property (retain, readwrite, nonatomic) NSString *apiPath;
+@property (retain, readwrite, nonatomic) NSString *scriptName;
+@property (retain, readwrite, nonatomic) NSString *sessionUuid;
+@property (retain, readwrite, nonatomic) NSString *sessionToken;
 
++ (id)config;
 - (id)init;
+- (void)dealloc;
 
 @end

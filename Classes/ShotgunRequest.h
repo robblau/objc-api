@@ -8,9 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import "ASIHTTPRequest.h"
+#import "ASIHTTPRequestDelegate.h"
 
-@class ShotgunEntity;
 @class ShotgunConfig;
 
 /// @typedef A block taking no parameters and returning no value
@@ -21,18 +20,13 @@ typedef id (^ShotgunPostProcessBlock)(NSDictionary *, NSString *);
 #pragma mark ShotgunRequest
 
 /** Represents a simple request being made to a %Shotgun instance. */
-@interface ShotgunRequest : NSObject <ASIHTTPRequestDelegate> {
-    NSUInteger timeout;
-    NSUInteger maxAttempts;
-    NSString *responseBody;
-    NSUInteger _currentAttempt;
-    ASIHTTPRequest *_request;
-    ShotgunRequestBlock startedBlock;
-    ShotgunRequestBlock completionBlock;
-    ShotgunRequestBlock failureBlock;
-    ShotgunPostProcessBlock postProcessBlock;
-    id processedResults;
-}
+@interface ShotgunRequest : NSOperation <ASIHTTPRequestDelegate>;
+
+/*! Initialize a request
+ *
+ * See initWithConfig:path:body:headers:andHTTPMethod:
+ */
++ (id)shotgunRequestWithConfig:(ShotgunConfig *)config path:(NSString *)path body:(NSString *)body headers:(NSDictionary *)headers andHTTPMethod:(NSString *)method;
 
 /*! Initialize the request
  *
@@ -52,12 +46,17 @@ typedef id (^ShotgunPostProcessBlock)(NSDictionary *, NSString *);
 /** Start the connection */
 - (void)startAsynchronous;
 
-/** The return value of the request */
-- (id)response;
+- (void)dealloc;
 
-@property (readwrite, copy) ShotgunRequestBlock startedBlock; ///< The block called when the request is started
-@property (readwrite, copy) ShotgunRequestBlock completionBlock; ///< The block called when the request completes
-@property (readwrite, copy) ShotgunRequestBlock failedBlock; ///< The block called when the request errors
-@property (readwrite, copy) ShotgunPostProcessBlock postProcessBlock; ///< Internally used to process the raw results from the server
+@property (retain, readonly, nonatomic) id response; ///< The return value of the request
+@property (retain, readonly, nonatomic) NSError *error; ///< The value of an error if it occurred.
+
+@property (retain, readwrite, nonatomic) NSOperationQueue *queue; ///< The operation queue to run in.  Defaults to the main queue.
+@property (copy, readwrite, nonatomic) ShotgunRequestBlock startedBlock; ///< The block called when the request is started
+@property (copy, readwrite, nonatomic) ShotgunRequestBlock completionBlock; ///< The block called when the request completes
+@property (copy, readwrite, nonatomic) ShotgunRequestBlock failedBlock; ///< The block called when the request errors
+
+@property (assign, readonly, nonatomic) BOOL isFinished;
+@property (assign, readonly, nonatomic) BOOL isExecuting;
 
 @end

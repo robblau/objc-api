@@ -8,16 +8,30 @@
 
 #import "ClientCapabilities.h"
 
-
 @implementation ClientCapabilities
 
-- (id) init {
+@synthesize platform = platform_;
+@synthesize localPathField = localPathField_;
+
++ (id)clientCapabilities
+{
+    return [[[ClientCapabilities alloc] init] autorelease];
+}
+
+- (id)init {
     self = [super init];
     if (self) {
-        platform = @"mac";
-        localPathField = @"local_path_mac";
+        self.platform = @"mac";
+        self.localPathField = @"local_path_mac";
     }
     return self;
+}
+
+- (void)dealloc
+{
+    self.platform = Nil;
+    self.localPathField = Nil;
+    [super dealloc];
 }
 
 @end

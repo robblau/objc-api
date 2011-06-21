@@ -8,18 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
+@interface ServerCapabilities : NSObject;
 
-@interface ServerCapabilities : NSObject {
-    NSArray *version;
-    BOOL isDev;
-    BOOL hasPaging;
-}
+@property (assign, readonly, nonatomic) BOOL isDev;
+@property (assign, readonly, nonatomic) BOOL hasPaging;
+@property (retain, readonly, nonatomic) NSArray *version;
 
-@property (readonly) BOOL isDev;
-@property (readonly) BOOL hasPaging;
-
-- (id)initWithHost: (NSString *)host andMeta:(NSDictionary *)meta;
-- (void)_ensureJSONSupported;
-- (BOOL)_isPaging;
++ (id)serverCapabilitiesWithHost:(NSString *)host andMeta:(NSDictionary *)meta;
+- (id)initWithHost:(NSString *)host andMeta:(NSDictionary *)meta;
+- (void)dealloc;
 
 @end

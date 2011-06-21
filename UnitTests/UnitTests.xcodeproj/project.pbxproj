@@ -54,6 +54,8 @@
 		5CA19C7F13A83D29001EFE89 /* libz.1.2.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CA19C7E13A83D29001EFE89 /* libz.1.2.3.dylib */; };
 		5CA19C8413A83E13001EFE89 /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5CA19C8113A83E13001EFE89 /* Config.plist */; };
 		5CA19C8513A83E13001EFE89 /* test.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5CA19C8313A83E13001EFE89 /* test.jpg */; };
+		5CD2E3AF13AFCC2A0026C52E /* ShotgunApiLongTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CD2E3AE13AFCC2A0026C52E /* ShotgunApiLongTest.m */; };
+		5CD2E3B313AFCD1B0026C52E /* ShotgunApiTestBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CD2E3B213AFCD1B0026C52E /* ShotgunApiTestBase.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +65,7 @@
 		5C78863713A930F600937E54 /* ShotgunEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShotgunEntity.m; sourceTree = "<group>"; };
 		5C78864213A937D900937E54 /* ShotgunRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShotgunRequest.h; sourceTree = "<group>"; };
 		5C78864313A937D900937E54 /* ShotgunRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShotgunRequest.m; sourceTree = "<group>"; };
+		5C78D3A213B05EFE00EC8F85 /* ShotgunRequestPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShotgunRequestPrivate.h; sourceTree = "<group>"; };
 		5CA19B9213A83705001EFE89 /* GHUnitIOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GHUnitIOS.framework; path = "../Dependencies/gh-unit/Project-IPhone/build/Framework/GHUnitIOS.framework"; sourceTree = "<group>"; };
 		5CA19B9713A8375A001EFE89 /* SG API UnitTests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SG API UnitTests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5CA19B9D13A8375A001EFE89 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -83,7 +86,7 @@
 		5CA19BC613A8399C001EFE89 /* ShotgunApiTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShotgunApiTest.m; sourceTree = "<group>"; };
 		5CA19BC913A83ADE001EFE89 /* ClientCapabilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClientCapabilities.h; sourceTree = "<group>"; };
 		5CA19BCA13A83ADE001EFE89 /* ClientCapabilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClientCapabilities.m; sourceTree = "<group>"; };
-		5CA19BCB13A83ADE001EFE89 /* ShotgunConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; path = ShotgunConfig.h; sourceTree = "<group>"; };
+		5CA19BCB13A83ADE001EFE89 /* ShotgunConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShotgunConfig.h; sourceTree = "<group>"; };
 		5CA19BCC13A83ADE001EFE89 /* ShotgunConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShotgunConfig.m; sourceTree = "<group>"; };
 		5CA19BCD13A83ADE001EFE89 /* ServerCapabilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerCapabilities.h; sourceTree = "<group>"; };
 		5CA19BCE13A83ADE001EFE89 /* ServerCapabilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerCapabilities.m; sourceTree = "<group>"; };
@@ -143,6 +146,9 @@
 		5CA19C7E13A83D29001EFE89 /* libz.1.2.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.3.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.3.sdk/usr/lib/libz.1.2.3.dylib; sourceTree = DEVELOPER_DIR; };
 		5CA19C8113A83E13001EFE89 /* Config.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Config.plist; sourceTree = "<group>"; };
 		5CA19C8313A83E13001EFE89 /* test.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = test.jpg; sourceTree = "<group>"; };
+		5CD2E3AE13AFCC2A0026C52E /* ShotgunApiLongTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShotgunApiLongTest.m; sourceTree = "<group>"; };
+		5CD2E3B113AFCD1B0026C52E /* ShotgunApiTestBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShotgunApiTestBase.h; sourceTree = "<group>"; };
+		5CD2E3B213AFCD1B0026C52E /* ShotgunApiTestBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShotgunApiTestBase.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -201,7 +207,10 @@
 			children = (
 				5CA19C8113A83E13001EFE89 /* Config.plist */,
 				5CA19BC313A8384C001EFE89 /* GHUnitIOSTestMain.m */,
+				5CD2E3B113AFCD1B0026C52E /* ShotgunApiTestBase.h */,
+				5CD2E3B213AFCD1B0026C52E /* ShotgunApiTestBase.m */,
 				5CA19BC613A8399C001EFE89 /* ShotgunApiTest.m */,
+				5CD2E3AE13AFCC2A0026C52E /* ShotgunApiLongTest.m */,
 				5CA19BAA13A8375A001EFE89 /* SG_API_UnitTestsAppDelegate.h */,
 				5CA19BAB13A8375A001EFE89 /* SG_API_UnitTestsAppDelegate.m */,
 				5CA19C8213A83E13001EFE89 /* Resources */,
@@ -248,6 +257,7 @@
 				5CA19BCF13A83ADE001EFE89 /* Shotgun.h */,
 				5CA19BD013A83ADE001EFE89 /* Shotgun.m */,
 				5C78864213A937D900937E54 /* ShotgunRequest.h */,
+				5C78D3A213B05EFE00EC8F85 /* ShotgunRequestPrivate.h */,
 				5C78864313A937D900937E54 /* ShotgunRequest.m */,
 				5C78863613A930F600937E54 /* ShotgunEntity.h */,
 				5C78863713A930F600937E54 /* ShotgunEntity.m */,
@@ -455,6 +465,8 @@
 				5CA19C7713A83CC6001EFE89 /* Reachability.m in Sources */,
 				5C78863813A930F600937E54 /* ShotgunEntity.m in Sources */,
 				5C78864413A937D900937E54 /* ShotgunRequest.m in Sources */,
+				5CD2E3AF13AFCC2A0026C52E /* ShotgunApiLongTest.m in Sources */,
+				5CD2E3B313AFCD1B0026C52E /* ShotgunApiTestBase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

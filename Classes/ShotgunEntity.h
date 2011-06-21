@@ -13,11 +13,16 @@
  * @details
  * This is a thin wrapper around <a href="http://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSMutableDictionary_Class/Reference/Reference.html#//apple_ref/doc/uid/20000141-17091">NSMutableDictionary</a>.
  */
-@interface ShotgunEntity : NSMutableDictionary {
-    NSMutableDictionary *_internal;
-}
+@interface ShotgunEntity : NSMutableDictionary;
 
-@property (readonly) NSNumber *entityId;   ///< The id of the entity in %Shotgun
-@property (readonly) NSString *entityType; ///< The type of the entity in %Shotgun
+@property (retain, readonly, nonatomic) NSNumber *entityId;   ///< The id of the entity in %Shotgun
+@property (retain, readonly, nonatomic) NSString *entityType; ///< The type of the entity in %Shotgun
+
++ (id)shotgunEntity; ///< Initialize an empty entity.
++ (id)shotgunEntityWithDictionary:(NSDictionary *)dictionary; ///< Initialize an entity with the provided dictionary.
++ (id)shotgunEntityWithJSON:(NSString *)json; ///< Initialize an entity with the dictionary value of the JSON string.
+- (id)init;
+- (id)initWithJSON:(NSString *)json;
+- (void)dealloc;
 
 @end

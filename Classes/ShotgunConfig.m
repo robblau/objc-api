@@ -10,39 +10,52 @@
 
 @implementation ShotgunConfig
 
-@synthesize maxRpcAttempts;
-@synthesize timeoutSecs;
-@synthesize apiVer;
-@synthesize recordsPerPage;
-@synthesize apiKey;
-@synthesize scriptName;
-@synthesize sessionUuid;
-@synthesize scheme;
-@synthesize server;
-@synthesize apiPath;
-@synthesize sessionToken;
+@synthesize maxRpcAttempts = maxRpcAttempts_;
+@synthesize timeoutSecs= timeoutSecs_;
+@synthesize apiVer = apiVer_;
+@synthesize recordsPerPage = recordsPerPage_;
+@synthesize apiKey = apiKey_;
+@synthesize scriptName = scriptName_;
+@synthesize sessionUuid = sessionUuid_;
+@synthesize scheme = scheme_;
+@synthesize server = server_;
+@synthesize apiPath = apiPath_;
+@synthesize sessionToken = sessionToken_;
 
-- (id)init {
++ (id)config
+{
+    return [[[ShotgunConfig alloc] init] autorelease];
+}
+
+- (id)init 
+{
     self = [super init];
     if (self) {
-        maxRpcAttempts = 3;
-        timeoutSecs = 3;
-        apiVer = [[NSString alloc] initWithString:@"api3"];
-        recordsPerPage = 500;
-        apiKey = Nil;
-        scriptName = Nil;
-        sessionUuid = Nil;
-        scheme = Nil;
-        server = Nil;
-        apiPath = Nil;
-        sessionToken = Nil;
+        self.maxRpcAttempts = 3;
+        self.timeoutSecs = 3;
+        self.apiVer = @"api3";
+        self.recordsPerPage = 500;
+        self.apiKey = Nil;
+        self.scheme = Nil;
+        self.server = Nil;
+        self.apiPath = Nil;
+        self.scriptName = Nil;
+        self.sessionUuid = Nil;
+        self.sessionToken = Nil;
     }
-    
     return self;
 }
 
-- (void)dealloc {
-    [apiVer release];
+- (void)dealloc 
+{
+    self.apiVer = Nil;
+    self.apiKey = Nil;
+    self.scheme = Nil;
+    self.server = Nil;
+    self.apiPath = Nil;
+    self.scriptName = Nil;
+    self.sessionUuid = Nil;
+    self.sessionToken = Nil;
     [super dealloc];
 }
 

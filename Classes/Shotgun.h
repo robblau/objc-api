@@ -196,9 +196,11 @@
  * @section Dependencies
  *  \li ASIHTTPRequest: http://allseeing-i.com/ASIHTTPRequest/
  *  \li SBJson: http://stig.github.com/json-framework/
+ *  \li GHUnit (only needed to run the unit tests): https://github.com/gabriel/gh-unit
  *
  * @section Links
  * \li Python API: https://github.com/shotgunsoftware/python-api
+ * \li Mailing List: https://groups.google.com/group/shotgun-objc-api
  * \li Issues: https://github.com/robblau/objc-api/issues
  *
  * Rob Blau <rblau@laika.com>
@@ -212,23 +214,16 @@
 #import "ShotgunEntity.h"
 #import "ShotgunRequest.h"
 
-@class ShotgunConfig;
-@class ShotgunHTTPRequest;
-@class ServerCapabilities;
-@class ClientCapabilities;
-
 /** Represents a connection to a shotgun server. */
-@interface Shotgun : NSObject {
-@private
-    ShotgunConfig *_config;
-    ServerCapabilities *_serverCaps;
-    ClientCapabilities *_clientCaps;
-}
+@interface Shotgun : NSObject;
 
-#pragma mark -
-#pragma mark Public Methods
+#pragma mark - Initialize
 
-- (id)initWithUrl:(NSString *)url scriptName:(NSString *)scriptName andKey:(NSString *)key;
+/*! Connect to shotgun.
+ *
+ * See initWithUrl
+ */
++ (id)shotgunWithUrl:(NSString *)url scriptName:(NSString *)scriptName andKey:(NSString *)key;
 
 /*! Connect to shotgun.
  *
@@ -242,6 +237,7 @@
 - (id)initWithUrl:(NSString *)url scriptName:(NSString *)scriptName andKey:(NSString *)key;
 
 #pragma mark Query Information
+
 /*! Return information about the shotgun server.
  *
  * @return A ShotgunRequest whose response is an NSDictionary with information about the server.
@@ -277,6 +273,7 @@
                         andPage:(NSUInteger)page retiredOnly:(BOOL)retiredOnly;
 
 #pragma mark Modify Information
+
 - (ShotgunRequest *)createEntityOfType:(NSString *)entityType withData:(id)data;
 
 /*! Create a new entity
@@ -328,6 +325,7 @@
 - (ShotgunRequest *)batch:(id)requests;
 
 #pragma mark Meta Schema
+
 /*!
  * @see The <a href="https://github.com/shotgunsoftware/python-api/wiki/Reference%3A-Methods">official docs</a>
  */
@@ -367,6 +365,7 @@
 - (void)setSessionUuid:(NSString *)uuid;
 
 #pragma mark Upload and Download Files
+
 /*!
  * @see The <a href="https://github.com/shotgunsoftware/python-api/wiki/Reference%3A-Methods">official docs</a>
  */
